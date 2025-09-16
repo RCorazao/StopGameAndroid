@@ -1,10 +1,12 @@
 package com.reicode.stopgame.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.reicode.stopgame.feature.home.HomeScreen
+import com.reicode.stopgame.feature.lobby.LobbyScreen
 import com.reicode.stopgame.realtime.SignalRService
+import com.reicode.stopgame.realtime.dto.RoomDto
+import com.reicode.stopgame.realtime.dto.RoomState
 
 sealed class ScreenState {
     object Home : ScreenState()
@@ -15,15 +17,39 @@ sealed class ScreenState {
     object Finished : ScreenState()
 }
 
+fun RoomDto.toScreenState(): ScreenState {
+    return when (RoomState.fromValue(state)) {
+        RoomState.Waiting -> ScreenState.Lobby
+        RoomState.Playing -> ScreenState.Playing
+        RoomState.Voting -> ScreenState.Voting
+        RoomState.Results -> ScreenState.Results
+        RoomState.Finished -> ScreenState.Finished
+    }
+}
+
 @Composable
 fun AppNav(signalRService: SignalRService) {
-    val screenState by signalRService.screenState.collectAsState()
+    val screenState = signalRService.screenState.collectAsStateWithLifecycle().value
+    val room        = signalRService.room.collectAsStateWithLifecycle().value
+    val player      = signalRService.player.collectAsStateWithLifecycle().value
 
     when (screenState) {
         is ScreenState.Home -> HomeScreen(
             onCreateRoom = { name -> signalRService.createRoom(name) },
-            onJoinRoom = { name, code -> signalRService.joinRoom(name, code) }
+            onJoinRoom = { code, name -> signalRService.joinRoom(code, name) }
         )
+
+        is ScreenState.Lobby -> LobbyScreen(
+            room = room,
+            currentPlayer = player,
+            onEditSettings = {
+                // TODO
+            },
+            onStartRound = {
+                // TODO
+            }
+        )
+
         else -> {}
     }
 }

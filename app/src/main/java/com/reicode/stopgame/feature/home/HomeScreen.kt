@@ -161,7 +161,7 @@ fun HomeScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Button(onClick = {
-                            onJoinRoom(playerName, roomCode)
+                            onJoinRoom(roomCode, playerName)
                         }) {
                             Text("Join Room")
                         }
