@@ -24,20 +24,9 @@ fun HomeScreen(
     val showJoinDialog by viewModel.showJoinDialog.collectAsState()
     var playerName by remember { mutableStateOf("") }
 
-    val gradient = Brush.linearGradient(
-        colors = listOf(
-            Color(0xFF1E3A8A),
-            Color(0xFF3B82F6),
-            Color.White
-        ),
-        start = Offset(0f, 0f),
-        end = Offset.Infinite
-    )
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(gradient)
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
