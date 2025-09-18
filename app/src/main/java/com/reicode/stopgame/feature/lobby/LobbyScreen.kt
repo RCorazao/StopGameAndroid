@@ -39,12 +39,9 @@ fun LobbyScreen(
 ) {
     // Dialog state management with remember and mutableStateOf for edit mode
     var showEditDialog by remember { mutableStateOf(false) }
-    println("LobbyScreen recomposed, isUpdatingSettings = $isUpdatingSettings")
-    // Close dialog when update succeeds (no error and not updating)
+
     LaunchedEffect(isUpdatingSettings, updateError) {
-        println("inside launched")
         if (!isUpdatingSettings && showEditDialog) {
-            println("inside change")
             showEditDialog = false
         }
     }

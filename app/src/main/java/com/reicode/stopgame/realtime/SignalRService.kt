@@ -61,6 +61,15 @@ class SignalRService(
             _error.value = errorMsg
             _isUpdatingSettings.value = false
         }, String::class.java)
+
+        // Connection closed handler
+        connection.onClosed { exception ->
+            println("🔌 SignalR connection closed: ${exception?.message ?: "Unknown reason"}")
+            // Clear room data when connection is lost to prevent stale state
+            if (_room.value != null) {
+                // TODO: reconnection
+            }
+        }
     }
 
     // --- Public API ---
@@ -111,7 +120,13 @@ class SignalRService(
     }
 
     fun leaveRoom() {
-        connection.send("LeaveRoom")
+        try {
+            connection.send("LeaveRoom")
+            clearRoomData()
+        } catch (e: Exception) {
+            println("❌ Failed to leave room: ${e.message}")
+            clearRoomData()
+        }
     }
 
     fun clearError() {
@@ -119,6 +134,15 @@ class SignalRService(
     }
 
     // --- Internals ---
+
+    private fun clearRoomData() {
+        _room.value = null
+        _player.value = null
+        _screenState.value = ScreenState.Home
+        _error.value = null
+        _isUpdatingSettings.value = false
+        println("✅ Room data cleared, returning to home screen")
+    }
 
     private fun applyRoomAndPlayer(room: RoomDto, me: PlayerDto) {
         _room.value = room
