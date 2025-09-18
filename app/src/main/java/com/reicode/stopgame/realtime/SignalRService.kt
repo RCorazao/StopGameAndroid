@@ -38,6 +38,9 @@ class SignalRService(
     private val _isUpdatingSettings = MutableStateFlow(false)
     val isUpdatingSettings: StateFlow<Boolean> = _isUpdatingSettings.asStateFlow()
 
+    private val _shouldSubmitAnswers = MutableStateFlow(false)
+    val shouldSubmitAnswers: StateFlow<Boolean> = _shouldSubmitAnswers.asStateFlow()
+
     private val connection: HubConnection =
         HubConnectionBuilder.create(hubUrl).build()
 
@@ -67,6 +70,13 @@ class SignalRService(
             println("Round started: ${room}")
             applyRoom(room)
         }, RoomDto::class.java)
+
+        connection.on("RoundStopped", {
+            println("Round stopped")
+            // applyRoom(room)
+            // Trigger automatic answer submission
+            _shouldSubmitAnswers.value = true
+        })
 
         // Error channel
         connection.on("Error", { errorMsg: String ->
@@ -139,6 +149,29 @@ class SignalRService(
         }
     }
 
+    fun stopRound() {
+        try {
+            connection.send("Stop")
+        } catch (e: Exception) {
+            println("❌ Failed to leave room: ${e.message}")
+        }
+    }
+
+    fun submitAnswers(answers: Map<String, String>) {
+        try {
+            val request = SubmitAnswersRequest(answers)
+            connection.send("SubmitAnswers", request)
+            println("✅ Answers submitted: $answers")
+        } catch (e: Exception) {
+            println("❌ Failed to submit answers: ${e.message}")
+            _error.value = "Failed to submit answers: ${e.message}"
+        }
+    }
+
+    fun clearShouldSubmitAnswers() {
+        _shouldSubmitAnswers.value = false
+    }
+
     fun leaveRoom() {
         try {
             connection.send("LeaveRoom")
@@ -161,6 +194,7 @@ class SignalRService(
         _screenState.value = ScreenState.Home
         _error.value = null
         _isUpdatingSettings.value = false
+        _shouldSubmitAnswers.value = false
         println("✅ Room data cleared, returning to home screen")
     }
 

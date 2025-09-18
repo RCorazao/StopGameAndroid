@@ -20,70 +20,64 @@ import com.reicode.stopgame.realtime.dto.PlayerDto
 import com.reicode.stopgame.realtime.dto.RoomDto
 
 @Composable
-fun RoomInfoCard(
-    room: RoomDto?,
-    statusText: String = "Waiting for players"
-) {
+fun RoomInfoCard(room: RoomDto?, statusText: String = "Waiting for players") {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
     ) {
         Column(
-            modifier = Modifier.padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
             ) {
                 Icon(
-                    Icons.Default.Person,
-                    contentDescription = null,
-                    tint = Color(0xFF6B7280),
-                    modifier = Modifier.size(20.dp)
+                        Icons.Default.Person,
+                        contentDescription = null,
+                        tint = Color(0xFF6B7280),
+                        modifier = Modifier.size(20.dp)
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = "Room: ${room?.code ?: "..."}",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    color = Color(0xFF1F2937)
+                        text = "Room: ${room?.code ?: "..."}",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        color = Color(0xFF1F2937)
                 )
             }
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "${room?.players?.size ?: 0} / ${room?.maxPlayers ?: 0} players • $statusText",
-                fontSize = 14.sp,
-                color = Color(0xFF6B7280)
+                    text =
+                            "${room?.players?.size ?: 0} / ${room?.maxPlayers ?: 0} players • $statusText",
+                    fontSize = 14.sp,
+                    color = Color(0xFF6B7280)
             )
         }
     }
 }
 
 @Composable
-fun LeaveRoomCard(
-    onLeaveRoom: () -> Unit
-) {
+fun LeaveRoomCard(onLeaveRoom: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
     ) {
         OutlinedButton(
-            onClick = onLeaveRoom,
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = Color(0xFF6B7280)
-            ),
-            border = BorderStroke(1.dp, Color(0xFFE5E7EB)),
-            shape = RoundedCornerShape(12.dp)
+                onClick = onLeaveRoom,
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF6B7280)),
+                border = BorderStroke(1.dp, Color(0xFFE5E7EB)),
+                shape = RoundedCornerShape(12.dp)
         ) {
             Icon(
-                Icons.Default.ExitToApp,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp)
+                    Icons.Default.ExitToApp,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
             )
             Spacer(Modifier.width(8.dp))
             Text("Leave Room", fontWeight = FontWeight.Medium, fontSize = 16.sp)
@@ -93,24 +87,22 @@ fun LeaveRoomCard(
 
 @Composable
 fun GameScreenLayout(
-    room: RoomDto?,
-    currentPlayer: PlayerDto?,
-    onLeaveRoom: () -> Unit,
-    statusText: String,
-    content: @Composable () -> Unit
+        room: RoomDto?,
+        currentPlayer: PlayerDto?,
+        onLeaveRoom: () -> Unit,
+        statusText: String,
+        content: @Composable () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                modifier =
+                        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             RoomInfoCard(room = room, statusText = statusText)
-            
+
             content()
-            
+
             LeaveRoomCard(onLeaveRoom = onLeaveRoom)
         }
     }

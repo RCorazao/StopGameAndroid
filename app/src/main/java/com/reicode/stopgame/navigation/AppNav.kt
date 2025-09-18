@@ -41,6 +41,7 @@ fun AppNav(signalRService: SignalRService) {
     val player      = signalRService.player.collectAsStateWithLifecycle().value
     val isUpdatingSettings = signalRService.isUpdatingSettings.collectAsStateWithLifecycle().value
     val error = signalRService.error.collectAsStateWithLifecycle().value
+    val shouldSubmitAnswers = signalRService.shouldSubmitAnswers.collectAsStateWithLifecycle().value
 
     when (screenState) {
         is ScreenState.Home -> HomeScreen(
@@ -74,8 +75,18 @@ fun AppNav(signalRService: SignalRService) {
         is ScreenState.Playing -> PlayingScreen(
             room = room,
             currentPlayer = player,
+            shouldSubmitAnswers = shouldSubmitAnswers,
             onLeaveRoom = {
                 signalRService.leaveRoom()
+            },
+            onStopRound = {
+                signalRService.stopRound()
+            },
+            onSubmitAnswers = { answers ->
+                signalRService.submitAnswers(answers)
+            },
+            onClearShouldSubmitAnswers = {
+                signalRService.clearShouldSubmitAnswers()
             }
         )
 
