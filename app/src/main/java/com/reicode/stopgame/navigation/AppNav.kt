@@ -7,6 +7,9 @@ import com.reicode.stopgame.feature.lobby.LobbyScreen
 import com.reicode.stopgame.realtime.SignalRService
 import com.reicode.stopgame.realtime.dto.RoomDto
 import com.reicode.stopgame.realtime.dto.RoomState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 sealed class ScreenState {
     object Home : ScreenState()
@@ -32,6 +35,8 @@ fun AppNav(signalRService: SignalRService) {
     val screenState = signalRService.screenState.collectAsStateWithLifecycle().value
     val room        = signalRService.room.collectAsStateWithLifecycle().value
     val player      = signalRService.player.collectAsStateWithLifecycle().value
+    val isUpdatingSettings = signalRService.isUpdatingSettings.collectAsStateWithLifecycle().value
+    val error = signalRService.error.collectAsStateWithLifecycle().value
 
     when (screenState) {
         is ScreenState.Home -> HomeScreen(
@@ -42,12 +47,24 @@ fun AppNav(signalRService: SignalRService) {
         is ScreenState.Lobby -> LobbyScreen(
             room = room,
             currentPlayer = player,
-            onEditSettings = {
-                // TODO
+            onUpdateRoomSettings = { roomSettings ->
+                CoroutineScope(Dispatchers.Main).launch {
+                    try {
+                        signalRService.updateRoomSettings(roomSettings)
+                    } catch (e: Exception) {
+                        // Error is handled in SignalR service
+                    }
+                }
             },
             onStartRound = {
                 // TODO
-            }
+            },
+            onLeaveRoom = {
+                signalRService.leaveRoom()
+            },
+            isUpdatingSettings = isUpdatingSettings,
+            updateError = error,
+            onClearError = { signalRService.clearError() }
         )
 
         else -> {}

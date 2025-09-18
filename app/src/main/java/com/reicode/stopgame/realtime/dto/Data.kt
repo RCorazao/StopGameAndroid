@@ -9,6 +9,14 @@ data class JoinRoomRequest(
     val playerName: String
 )
 
+data class UpdateRoomSettingsRequest(
+    val maxPlayers: Int,
+    val maxRounds: Int,
+    val roundDurationSeconds: Int,
+    val votingDurationSeconds: Int,
+    val topics: List<String>
+)
+
 data class RoomDto(
     val id: String,
     val code: String,

@@ -11,7 +11,7 @@ import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.reicode.stopgame.feature.lobby.data.RoomSettings
 import com.reicode.stopgame.realtime.dto.PlayerDto
 import com.reicode.stopgame.realtime.dto.RoomDto
 import com.reicode.stopgame.realtime.dto.TopicDto
@@ -29,10 +30,24 @@ import com.reicode.stopgame.realtime.dto.TopicDto
 fun LobbyScreen(
         room: RoomDto?,
         currentPlayer: PlayerDto?,
-        onEditSettings: () -> Unit = {},
+        onUpdateRoomSettings: (RoomSettings) -> Unit = {},
         onStartRound: () -> Unit = {},
-        onLeaveRoom: () -> Unit = {}
+        onLeaveRoom: () -> Unit = {},
+        isUpdatingSettings: Boolean = false,
+        updateError: String? = null,
+        onClearError: () -> Unit = {}
 ) {
+    // Dialog state management with remember and mutableStateOf for edit mode
+    var showEditDialog by remember { mutableStateOf(false) }
+    println("LobbyScreen recomposed, isUpdatingSettings = $isUpdatingSettings")
+    // Close dialog when update succeeds (no error and not updating)
+    LaunchedEffect(isUpdatingSettings, updateError) {
+        println("inside launched")
+        if (!isUpdatingSettings && showEditDialog) {
+            println("inside change")
+            showEditDialog = false
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -169,8 +184,11 @@ fun LobbyScreen(
                                 color = Color(0xFF1F2937)
                             )
                         }
-                        TextButton(onClick = onEditSettings) {
-                            Text("Edit", color = Color(0xFF3B82F6), fontWeight = FontWeight.Medium)
+                        // Only show edit button for host
+                        if (currentPlayer?.isHost == true) {
+                            TextButton(onClick = { showEditDialog = true }) {
+                                Text("Edit", color = Color(0xFF3B82F6), fontWeight = FontWeight.Medium)
+                            }
                         }
                     }
 
@@ -245,40 +263,9 @@ fun LobbyScreen(
                     )
                     Spacer(Modifier.height(12.dp))
 
-                    // Topics in a flow layout
+                    // Topics in a flow layout using the new TopicsFlowLayout composable
                     val topics = room?.topics ?: emptyList()
-                    val chunkedTopics = topics.chunked(4) // 4 topics per row
-
-                    chunkedTopics.forEach { rowTopics ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            rowTopics.forEach { topic ->
-                                AssistChip(
-                                    onClick = {},
-                                    label = {
-                                        Text(
-                                            topic.name,
-                                            fontSize = 12.sp,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                    },
-                                    colors =
-                                        AssistChipDefaults.assistChipColors(
-                                            containerColor = Color(0xFFF3F4F6),
-                                            labelColor = Color(0xFF374151)
-                                        ),
-                                    modifier = Modifier.weight(1f, fill = false)
-                                )
-                            }
-                            // Fill remaining space if less than 4 topics in row
-                            repeat(4 - rowTopics.size) { Spacer(modifier = Modifier.weight(1f)) }
-                        }
-                        if (rowTopics != chunkedTopics.last()) {
-                            Spacer(Modifier.height(8.dp))
-                        }
-                    }
+                    TopicsFlowLayout(topics = topics)
                 }
             }
 
@@ -364,6 +351,25 @@ fun LobbyScreen(
                 }
             }
         }
+    }
+    
+    // Room Settings Edit Dialog
+    if (showEditDialog && room != null) {
+        RoomSettingsEditDialog(
+            currentSettings = RoomSettings.fromRoomDto(room),
+            isLoading = isUpdatingSettings,
+            error = updateError,
+            onDismiss = { 
+                if (!isUpdatingSettings) {
+                    showEditDialog = false
+                    onClearError()
+                }
+            },
+            onSave = { updatedSettings ->
+                onUpdateRoomSettings(updatedSettings)
+                // Dialog will be closed when update succeeds via real-time update
+            }
+        )
     }
 }
 
@@ -451,9 +457,11 @@ fun LobbyScreenPreview() {
         LobbyScreen(
                 room = sampleRoom,
                 currentPlayer = currentPlayer,
-                onEditSettings = {},
                 onStartRound = {},
-                onLeaveRoom = {}
+                onLeaveRoom = {},
+                isUpdatingSettings = false,
+                updateError = null,
+                onClearError = {}
         )
     }
 }
@@ -526,9 +534,11 @@ fun LobbyScreenNonHostPreview() {
         LobbyScreen(
                 room = sampleRoom,
                 currentPlayer = currentPlayer,
-                onEditSettings = {},
                 onStartRound = {},
-                onLeaveRoom = {}
+                onLeaveRoom = {},
+                isUpdatingSettings = false,
+                updateError = null,
+                onClearError = {}
         )
     }
 }

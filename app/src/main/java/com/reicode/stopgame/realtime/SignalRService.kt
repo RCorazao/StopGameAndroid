@@ -3,6 +3,7 @@ package com.reicode.stopgame.realtime
 import com.google.gson.Gson
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
+import com.reicode.stopgame.feature.lobby.data.RoomSettings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,6 +31,9 @@ class SignalRService(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
+    private val _isUpdatingSettings = MutableStateFlow(false)
+    val isUpdatingSettings: StateFlow<Boolean> = _isUpdatingSettings.asStateFlow()
+
     private val connection: HubConnection =
         HubConnectionBuilder.create(hubUrl).build()
 
@@ -48,11 +52,14 @@ class SignalRService(
             println("Room updated: ${room}")
             applyRoom(room)
             refreshSelfFrom(room)
+
+            _isUpdatingSettings.value = false
         }, RoomDto::class.java)
 
         // Error channel
         connection.on("Error", { errorMsg: String ->
             _error.value = errorMsg
+            _isUpdatingSettings.value = false
         }, String::class.java)
     }
 
@@ -76,6 +83,39 @@ class SignalRService(
 
     fun joinRoom(roomCode: String, playerName: String) {
         connection.send("JoinRoom", JoinRoomRequest(roomCode, playerName))
+    }
+
+    fun updateRoomSettings(roomSettings: RoomSettings) {
+        try {
+            val currentRoom = _room.value
+
+            if (currentRoom == null) return
+
+            _isUpdatingSettings.value = true
+            _error.value = null
+
+            val updateRequest = UpdateRoomSettingsRequest(
+                maxPlayers = roomSettings.maxPlayers,
+                maxRounds = roomSettings.maxRounds,
+                roundDurationSeconds = roomSettings.roundDurationSeconds,
+                votingDurationSeconds = roomSettings.votingDurationSeconds,
+                topics = roomSettings.topics.map { it.name }
+            )
+            connection.send("UpdateRoomSettings", currentRoom.code, updateRequest)
+        } catch (e: Exception) {
+            println("❌ Failed to update room settings: ${e.message}")
+            _error.value = "Failed to update room settings: ${e.message}"
+            _isUpdatingSettings.value = false
+            throw e
+        }
+    }
+
+    fun leaveRoom() {
+        connection.send("LeaveRoom")
+    }
+
+    fun clearError() {
+        _error.value = null
     }
 
     // --- Internals ---
