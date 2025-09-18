@@ -4,6 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.reicode.stopgame.feature.home.HomeScreen
 import com.reicode.stopgame.feature.lobby.LobbyScreen
+import com.reicode.stopgame.feature.playing.PlayingScreen
+import com.reicode.stopgame.feature.voting.VotingScreen
+import com.reicode.stopgame.feature.results.ResultsScreen
+import com.reicode.stopgame.feature.finished.FinishedScreen
 import com.reicode.stopgame.realtime.SignalRService
 import com.reicode.stopgame.realtime.dto.RoomDto
 import com.reicode.stopgame.realtime.dto.RoomState
@@ -57,7 +61,7 @@ fun AppNav(signalRService: SignalRService) {
                 }
             },
             onStartRound = {
-                // TODO
+                signalRService.startRound()
             },
             onLeaveRoom = {
                 signalRService.leaveRoom()
@@ -67,6 +71,36 @@ fun AppNav(signalRService: SignalRService) {
             onClearError = { signalRService.clearError() }
         )
 
-        else -> {}
+        is ScreenState.Playing -> PlayingScreen(
+            room = room,
+            currentPlayer = player,
+            onLeaveRoom = {
+                signalRService.leaveRoom()
+            }
+        )
+
+        is ScreenState.Voting -> VotingScreen(
+            room = room,
+            currentPlayer = player,
+            onLeaveRoom = {
+                signalRService.leaveRoom()
+            }
+        )
+
+        is ScreenState.Results -> ResultsScreen(
+            room = room,
+            currentPlayer = player,
+            onLeaveRoom = {
+                signalRService.leaveRoom()
+            }
+        )
+
+        is ScreenState.Finished -> FinishedScreen(
+            room = room,
+            currentPlayer = player,
+            onLeaveRoom = {
+                signalRService.leaveRoom()
+            }
+        )
     }
 }

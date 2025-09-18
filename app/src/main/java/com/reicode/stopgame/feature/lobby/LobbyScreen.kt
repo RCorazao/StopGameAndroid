@@ -1,20 +1,13 @@
 package com.reicode.stopgame.feature.lobby
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -25,6 +18,7 @@ import com.reicode.stopgame.feature.lobby.data.RoomSettings
 import com.reicode.stopgame.realtime.dto.PlayerDto
 import com.reicode.stopgame.realtime.dto.RoomDto
 import com.reicode.stopgame.realtime.dto.TopicDto
+import com.reicode.stopgame.shared.GameScreenLayout
 
 @Composable
 fun LobbyScreen(
@@ -46,326 +40,245 @@ fun LobbyScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+    GameScreenLayout(
+            room = room,
+            currentPlayer = currentPlayer,
+            onLeaveRoom = onLeaveRoom,
+            statusText = "Waiting for players"
+    ) {
+        // --- Players ---
+        Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
         ) {
-            // --- Room Info ---
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors =
-                    CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
-            ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            Icons.Default.Person,
-                            contentDescription = null,
-                            tint = Color(0xFF6B7280),
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = "Room: ${room?.code ?: "..."}",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            color = Color(0xFF1F2937)
-                        )
-                    }
-                    Spacer(Modifier.height(4.dp))
-                    Text(
-                        text =
-                            "${room?.players?.size ?: 0} / ${room?.maxPlayers ?: 0} players • Waiting for players",
-                        fontSize = 14.sp,
-                        color = Color(0xFF6B7280)
-                    )
-                }
-            }
-
-            // --- Players ---
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors =
-                    CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
-            ) {
-                Column(modifier = Modifier.padding(24.dp)) {
-                    Text(
+            Column(modifier = Modifier.padding(24.dp)) {
+                Text(
                         "Players",
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         color = Color(0xFF1F2937)
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+                )
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    room?.players?.forEach { player ->
-                        Row(
+                room?.players?.forEach { player ->
+                    Row(
                             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
+                    ) {
+                        Text(
                                 text = player.name,
                                 fontWeight = FontWeight.Medium,
                                 color = Color(0xFF1F2937),
                                 fontSize = 15.sp
-                            )
-                            if (player.id == currentPlayer?.id) {
-                                Spacer(Modifier.width(8.dp))
-                                Text(text = "You", fontSize = 14.sp, color = Color(0xFF6B7280))
-                            }
-                            Spacer(Modifier.weight(1f))
-                            if (player.isHost) {
-                                AssistChip(
+                        )
+                        if (player.id == currentPlayer?.id) {
+                            Spacer(Modifier.width(8.dp))
+                            Text(text = "You", fontSize = 14.sp, color = Color(0xFF6B7280))
+                        }
+                        Spacer(Modifier.weight(1f))
+                        if (player.isHost) {
+                            AssistChip(
                                     onClick = {},
                                     label = {
                                         Text(
-                                            "Host",
-                                            fontSize = 12.sp,
-                                            fontWeight = FontWeight.Medium
+                                                "Host",
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Medium
                                         )
                                     },
                                     colors =
-                                        AssistChipDefaults.assistChipColors(
-                                            containerColor = Color(0xFFF59E0B),
-                                            labelColor = Color.White
-                                        )
-                                )
-                            }
+                                            AssistChipDefaults.assistChipColors(
+                                                    containerColor = Color(0xFFF59E0B),
+                                                    labelColor = Color.White
+                                            )
+                            )
                         }
                     }
                 }
             }
+        }
 
-            // --- Room Settings ---
-            Card(
+        // --- Room Settings ---
+        Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
-                colors =
-                    CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
-            ) {
-                Column(modifier = Modifier.padding(24.dp)) {
-                    Row(
+                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+        ) {
+            Column(modifier = Modifier.padding(24.dp)) {
+                Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
                                 Icons.Default.Settings,
                                 contentDescription = null,
                                 tint = Color(0xFF6B7280),
                                 modifier = Modifier.size(18.dp)
-                            )
-                            Spacer(Modifier.width(8.dp))
-                            Text(
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
                                 "Room Settings",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 color = Color(0xFF1F2937)
-                            )
-                        }
-                        // Only show edit button for host
-                        if (currentPlayer?.isHost == true) {
-                            TextButton(onClick = { showEditDialog = true }) {
-                                Text("Edit", color = Color(0xFF3B82F6), fontWeight = FontWeight.Medium)
-                            }
+                        )
+                    }
+                    // Only show edit button for host
+                    if (currentPlayer?.isHost == true) {
+                        TextButton(onClick = { showEditDialog = true }) {
+                            Text("Edit", color = Color(0xFF3B82F6), fontWeight = FontWeight.Medium)
                         }
                     }
+                }
 
-                    Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(20.dp))
 
-                    Row(
+                Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Column {
-                            Text(
+                ) {
+                    Column {
+                        Text(
                                 "Max Players",
                                 fontSize = 12.sp,
                                 color = Color(0xFF6B7280),
                                 fontWeight = FontWeight.Medium
-                            )
-                            Text(
+                        )
+                        Text(
                                 "${room?.maxPlayers ?: 0}",
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF1F2937),
                                 fontSize = 16.sp
-                            )
-                            Spacer(Modifier.height(12.dp))
-                            Text(
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        Text(
                                 "Round Duration",
                                 fontSize = 12.sp,
                                 color = Color(0xFF6B7280),
                                 fontWeight = FontWeight.Medium
-                            )
-                            Text(
+                        )
+                        Text(
                                 "${room?.roundDurationSeconds ?: 0}s",
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF1F2937),
                                 fontSize = 16.sp
-                            )
-                        }
-                        Column {
-                            Text(
+                        )
+                    }
+                    Column {
+                        Text(
                                 "Max Rounds",
                                 fontSize = 12.sp,
                                 color = Color(0xFF6B7280),
                                 fontWeight = FontWeight.Medium
-                            )
-                            Text(
+                        )
+                        Text(
                                 "${room?.maxRounds ?: 0}",
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF1F2937),
                                 fontSize = 16.sp
-                            )
-                            Spacer(Modifier.height(12.dp))
-                            Text(
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        Text(
                                 "Voting Duration",
                                 fontSize = 12.sp,
                                 color = Color(0xFF6B7280),
                                 fontWeight = FontWeight.Medium
-                            )
-                            Text(
+                        )
+                        Text(
                                 "${room?.votingDurationSeconds ?: 0}s",
                                 fontWeight = FontWeight.Bold,
                                 color = Color(0xFF1F2937),
                                 fontSize = 16.sp
-                            )
-                        }
+                        )
                     }
+                }
 
-                    Spacer(Modifier.height(20.dp))
-                    Text(
+                Spacer(Modifier.height(20.dp))
+                Text(
                         "Topics",
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
                         color = Color(0xFF1F2937)
-                    )
-                    Spacer(Modifier.height(12.dp))
+                )
+                Spacer(Modifier.height(12.dp))
 
-                    // Topics in a flow layout using the new TopicsFlowLayout composable
-                    val topics = room?.topics ?: emptyList()
-                    TopicsFlowLayout(topics = topics)
-                }
+                // Topics in a flow layout using the new TopicsFlowLayout composable
+                val topics = room?.topics ?: emptyList()
+                TopicsFlowLayout(topics = topics)
             }
+        }
 
-            // --- Start Button (Host only) ---
-            if (currentPlayer?.isHost == true) {
-                Card(
+        // --- Start Button (Host only) ---
+        if (currentPlayer?.isHost == true) {
+            Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
                     colors =
-                        CardDefaults.cardColors(
-                            containerColor = Color.White.copy(alpha = 0.9f)
-                        )
-                ) {
-                    Column(
+                            CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+            ) {
+                Column(
                         modifier = Modifier.padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
+                ) {
+                    Text(
                             "You are the host. Start the first round when ready!",
                             textAlign = TextAlign.Center,
                             color = Color(0xFF6B7280),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium
-                        )
+                    )
 
-                        Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(16.dp))
 
-                        Button(
+                    Button(
                             onClick = onStartRound,
                             enabled = (room?.players?.size ?: 0) >= 2,
                             modifier = Modifier.fillMaxWidth(),
                             colors =
-                                ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF10B981)
-                                ),
+                                    ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
                             shape = RoundedCornerShape(16.dp)
-                        ) {
-                            Text(
+                    ) {
+                        Text(
                                 "Start Round 1",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 modifier = Modifier.padding(vertical = 4.dp)
-                            )
-                        }
+                        )
+                    }
 
-                        if ((room?.players?.size ?: 0) < 2) {
-                            Spacer(Modifier.height(8.dp))
-                            Text(
+                    if ((room?.players?.size ?: 0) < 2) {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
                                 "Need at least 2 players to start",
                                 fontSize = 12.sp,
                                 color = Color(0xFF6B7280),
                                 textAlign = TextAlign.Center
-                            )
-                        }
+                        )
                     }
-                }
-            }
-
-            // --- Leave Room Button ---
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors =
-                    CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
-            ) {
-                OutlinedButton(
-                    onClick = onLeaveRoom,
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    colors =
-                        ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color(0xFF6B7280)
-                        ),
-                    border = BorderStroke(1.dp, Color(0xFFE5E7EB)),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(
-                        Icons.Default.ExitToApp,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text("Leave Room", fontWeight = FontWeight.Medium, fontSize = 16.sp)
                 }
             }
         }
     }
-    
+
     // Room Settings Edit Dialog
     if (showEditDialog && room != null) {
         RoomSettingsEditDialog(
-            currentSettings = RoomSettings.fromRoomDto(room),
-            isLoading = isUpdatingSettings,
-            error = updateError,
-            onDismiss = { 
-                if (!isUpdatingSettings) {
-                    showEditDialog = false
-                    onClearError()
+                currentSettings = RoomSettings.fromRoomDto(room),
+                isLoading = isUpdatingSettings,
+                error = updateError,
+                onDismiss = {
+                    if (!isUpdatingSettings) {
+                        showEditDialog = false
+                        onClearError()
+                    }
+                },
+                onSave = { updatedSettings ->
+                    onUpdateRoomSettings(updatedSettings)
+                    // Dialog will be closed when update succeeds via real-time update
                 }
-            },
-            onSave = { updatedSettings ->
-                onUpdateRoomSettings(updatedSettings)
-                // Dialog will be closed when update succeeds via real-time update
-            }
         )
     }
 }

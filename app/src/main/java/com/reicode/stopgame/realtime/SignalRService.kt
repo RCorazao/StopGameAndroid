@@ -10,9 +10,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import com.reicode.stopgame.realtime.dto.*
 import com.reicode.stopgame.navigation.ScreenState
 import com.reicode.stopgame.navigation.toScreenState
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@OptIn(DelicateCoroutinesApi::class)
 class SignalRService(
     hubUrl: String
 ) {
@@ -53,7 +57,15 @@ class SignalRService(
             applyRoom(room)
             refreshSelfFrom(room)
 
-            _isUpdatingSettings.value = false
+            kotlinx.coroutines.GlobalScope.launch {
+                delay(500)
+                _isUpdatingSettings.value = false
+            }
+        }, RoomDto::class.java)
+
+        connection.on("RoundStarted", { room: RoomDto ->
+            println("Round started: ${room}")
+            applyRoom(room)
         }, RoomDto::class.java)
 
         // Error channel
@@ -116,6 +128,14 @@ class SignalRService(
             _error.value = "Failed to update room settings: ${e.message}"
             _isUpdatingSettings.value = false
             throw e
+        }
+    }
+
+    fun startRound() {
+        try {
+            connection.send("StartRound")
+        } catch (e: Exception) {
+            println("❌ Failed to leave room: ${e.message}")
         }
     }
 
