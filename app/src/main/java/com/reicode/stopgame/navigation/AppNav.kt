@@ -93,6 +93,13 @@ fun AppNav(signalRService: SignalRService) {
         is ScreenState.Voting -> VotingScreen(
             room = room,
             currentPlayer = player,
+            voteAnswers = signalRService.voteAnswers.collectAsStateWithLifecycle().value,
+            onVote = { answerId, isValid ->
+                signalRService.vote(answerId, isValid)
+            },
+            onFinishVotingPhase = {
+                signalRService.finishVotingPhase()
+            },
             onLeaveRoom = {
                 signalRService.leaveRoom()
             }

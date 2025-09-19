@@ -41,6 +41,9 @@ class SignalRService(
     private val _shouldSubmitAnswers = MutableStateFlow(false)
     val shouldSubmitAnswers: StateFlow<Boolean> = _shouldSubmitAnswers.asStateFlow()
 
+    private val _voteAnswers = MutableStateFlow<List<VoteAnswerDto>>(emptyList())
+    val voteAnswers: StateFlow<List<VoteAnswerDto>> = _voteAnswers.asStateFlow()
+
     private val connection: HubConnection =
         HubConnectionBuilder.create(hubUrl).build()
 
@@ -77,6 +80,16 @@ class SignalRService(
             // Trigger automatic answer submission
             _shouldSubmitAnswers.value = true
         })
+
+        connection.on("VoteStarted", { voteAnswers: Array<VoteAnswerDto> ->
+            println("Vote started with ${voteAnswers.size} topics")
+            _voteAnswers.value = voteAnswers.toList()
+        }, Array<VoteAnswerDto>::class.java)
+
+        connection.on("VoteUpdate", { voteAnswers: Array<VoteAnswerDto> ->
+            println("Vote updated")
+            _voteAnswers.value = voteAnswers.toList()
+        }, Array<VoteAnswerDto>::class.java)
 
         // Error channel
         connection.on("Error", { errorMsg: String ->
@@ -186,6 +199,27 @@ class SignalRService(
         _error.value = null
     }
 
+    fun vote(answerId: String, isValid: Boolean) {
+        try {
+            val request = VoteRequest(answerId, isValid)
+            connection.send("Vote", request)
+            println("✅ Vote submitted: answerId=$answerId, isValid=$isValid")
+        } catch (e: Exception) {
+            println("❌ Failed to submit vote: ${e.message}")
+            _error.value = "Failed to submit vote: ${e.message}"
+        }
+    }
+
+    fun finishVotingPhase() {
+        try {
+            connection.send("FinishVotingPhase")
+            println("✅ Finish voting phase requested")
+        } catch (e: Exception) {
+            println("❌ Failed to finish voting phase: ${e.message}")
+            _error.value = "Failed to finish voting phase: ${e.message}"
+        }
+    }
+
     // --- Internals ---
 
     private fun clearRoomData() {
@@ -195,6 +229,7 @@ class SignalRService(
         _error.value = null
         _isUpdatingSettings.value = false
         _shouldSubmitAnswers.value = false
+        _voteAnswers.value = emptyList()
         println("✅ Room data cleared, returning to home screen")
     }
 

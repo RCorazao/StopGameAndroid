@@ -33,15 +33,15 @@ data class RoomDto(
 )
 
 enum class RoomState(val value: Int) {
-    Waiting(0),
-    Playing(1),
-    Voting(2),
-    Results(3),
-    Finished(4);
+        Waiting(0),
+        Playing(1),
+        Voting(2),
+        Results(3),
+        Finished(4);
 
-    companion object {
-        fun fromValue(value: Int) = values().firstOrNull { it.value == value } ?: Waiting
-    }
+        companion object {
+                fun fromValue(value: Int) = values().firstOrNull { it.value == value } ?: Waiting
+        }
 }
 
 data class PlayerDto(
@@ -93,3 +93,7 @@ data class VoteDto(
         val isValid: Boolean,
         val createdAt: String
 )
+
+data class VoteAnswerDto(val topicId: String, val topicName: String, val answers: List<AnswerDto>)
+
+data class VoteRequest(val answerId: String, val isValid: Boolean)
