@@ -108,6 +108,9 @@ fun AppNav(signalRService: SignalRService) {
         is ScreenState.Results -> ResultsScreen(
             room = room,
             currentPlayer = player,
+            onStartRound = {
+                signalRService.startRound()
+            },
             onLeaveRoom = {
                 signalRService.leaveRoom()
             }

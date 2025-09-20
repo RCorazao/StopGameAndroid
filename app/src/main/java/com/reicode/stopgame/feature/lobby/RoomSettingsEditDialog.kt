@@ -126,7 +126,7 @@ fun RoomSettingsEditDialog(
                     },
                     errorMessage = validationErrors["maxRounds"],
                     minValue = 1,
-                    maxValue = 20
+                    maxValue = 5
                 )
                 
                 // Round Duration Input Field
@@ -188,7 +188,16 @@ fun RoomSettingsEditDialog(
                         }
                     },
                     onRemoveTopic = { topic ->
-                        showRemoveConfirmation = topic
+                        val validationError = RoomSettingsValidator.validateTopicRemoval(
+                            editableSettings.topics,
+                            topic
+                        )
+
+                        if (validationError == null) {
+                            editableSettings = editableSettings.copy(
+                                topics = editableSettings.topics.filter { it.id != topic.id }
+                            )
+                        }
                     }
                 )
                 
@@ -463,7 +472,7 @@ private fun TopicsManagementSection(
         if (topicInputError == null) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Max 20 characters",
+                text = "Max 40 characters",
                 fontSize = 12.sp,
                 color = Color(0xFF9CA3AF),
                 modifier = Modifier.fillMaxWidth()
