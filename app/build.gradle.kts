@@ -69,4 +69,5 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
+    implementation("androidx.core:core-splashscreen:1.0.0")
 }
