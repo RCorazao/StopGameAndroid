@@ -57,6 +57,14 @@ class SignalRService(hubUrl: String) {
     private val _voteAnswers = MutableStateFlow<List<VoteAnswerDto>>(emptyList())
     val voteAnswers: StateFlow<List<VoteAnswerDto>> = _voteAnswers.asStateFlow()
 
+    private val _chatMessages = MutableStateFlow<List<ChatMessageDto>>(emptyList())
+    val chatMessages: StateFlow<List<ChatMessageDto>> = _chatMessages.asStateFlow()
+
+    private val _unreadMessageCount = MutableStateFlow(0)
+    val unreadMessageCount: StateFlow<Int> = _unreadMessageCount.asStateFlow()
+
+    private val _isChatOpen = MutableStateFlow(false)
+
     private val connection: HubConnection = HubConnectionBuilder.create(hubUrl).build()
 
     init {
@@ -130,6 +138,22 @@ class SignalRService(hubUrl: String) {
                     _voteAnswers.value = voteAnswers.toList()
                 },
                 Array<VoteAnswerDto>::class.java
+        )
+
+        connection.on(
+                "ChatNotification",
+                { chatMessage: ChatMessageDto ->
+                    println("Chat message received: ${chatMessage.message} from ${chatMessage.source}")
+                    val currentMessages = _chatMessages.value.toMutableList()
+                    currentMessages.add(chatMessage)
+                    _chatMessages.value = currentMessages
+                    
+                    // Only increment unread count when chat is closed
+                    if (!_isChatOpen.value) {
+                        _unreadMessageCount.value = _unreadMessageCount.value + 1
+                    }
+                },
+                ChatMessageDto::class.java
         )
 
         // Room reconnection response handler
@@ -317,6 +341,28 @@ class SignalRService(hubUrl: String) {
         }
     }
 
+    fun sendChat(message: String) {
+        try {
+            connection.send("SendChat", message)
+            println("✅ Chat message sent: $message")
+        } catch (e: Exception) {
+            println("❌ Failed to send chat message: ${e.message}")
+            _error.value = "Failed to send chat message: ${e.message}"
+        }
+    }
+
+    fun markMessagesAsRead() {
+        _unreadMessageCount.value = 0
+    }
+
+    fun setChatOpen(isOpen: Boolean) {
+        _isChatOpen.value = isOpen
+        if (isOpen) {
+            // Clear unread count when chat is opened
+            _unreadMessageCount.value = 0
+        }
+    }
+
     suspend fun disconnect() {
         withContext(Dispatchers.IO) {
             try {
@@ -483,6 +529,9 @@ class SignalRService(hubUrl: String) {
         _isUpdatingSettings.value = false
         _shouldSubmitAnswers.value = false
         _voteAnswers.value = emptyList()
+        _chatMessages.value = emptyList()
+        _unreadMessageCount.value = 0
+        _isChatOpen.value = false
         println("✅ Room data cleared, returning to home screen")
     }
 

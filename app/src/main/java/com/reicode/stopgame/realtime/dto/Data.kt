@@ -99,3 +99,13 @@ data class VoteDto(
 data class VoteAnswerDto(val topicId: String, val topicName: String, val answers: List<AnswerDto>)
 
 data class VoteRequest(val answerId: String, val isValid: Boolean)
+
+// Chat DTOs
+data class ChatMessageDto(
+        val player: PlayerDto?,
+        val message: String,
+        val timestamp: String,
+        val source: String // "Player" or "System"
+)
+
+data class SendChatRequest(val message: String)

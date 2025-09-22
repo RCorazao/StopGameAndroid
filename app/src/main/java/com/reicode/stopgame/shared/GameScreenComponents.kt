@@ -10,12 +10,18 @@ import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.reicode.stopgame.realtime.dto.PlayerDto
 import com.reicode.stopgame.realtime.dto.RoomDto
 
@@ -93,6 +99,13 @@ fun GameScreenLayout(
         statusText: String,
         content: @Composable () -> Unit
 ) {
+    // Use ChatViewModel for chat state management
+    val chatViewModel: ChatViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    
+    // Collect chat state from ViewModel
+    val chatMessages = chatViewModel.chatMessages.collectAsStateWithLifecycle().value
+    val unreadMessageCount = chatViewModel.unreadMessageCount.collectAsStateWithLifecycle().value
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
                 modifier =
@@ -105,5 +118,17 @@ fun GameScreenLayout(
 
             LeaveRoomCard(onLeaveRoom = onLeaveRoom)
         }
+        
+        // Chat badge positioned at bottom right
+        ChatBadge(
+            messages = chatMessages,
+            onSendMessage = { message -> chatViewModel.sendMessage(message) },
+            unreadCount = unreadMessageCount,
+            onMarkAsRead = { chatViewModel.markMessagesAsRead() },
+            onSetChatOpen = { isOpen -> chatViewModel.setChatOpen(isOpen) },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        )
     }
 }
