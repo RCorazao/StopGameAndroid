@@ -3,24 +3,37 @@ package com.reicode.stopgame.realtime
 import com.google.gson.Gson
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
+import com.reicode.stopgame.domain.model.ConnectionState
 import com.reicode.stopgame.feature.lobby.data.RoomSettings
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import com.reicode.stopgame.realtime.dto.*
 import com.reicode.stopgame.navigation.ScreenState
 import com.reicode.stopgame.navigation.toScreenState
+import com.reicode.stopgame.realtime.dto.*
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @OptIn(DelicateCoroutinesApi::class)
-class SignalRService(
-    hubUrl: String
-) {
+class SignalRService(hubUrl: String) {
     private val gson = Gson()
+
+    // Connection state tracking
+    private val _connectionState = MutableStateFlow(ConnectionState.Disconnected)
+    val connectionState: StateFlow<ConnectionState> = _connectionState.asStateFlow()
+
+    // Reconnection properties
+    private var reconnectAttempts = 0
+    private val maxReconnectAttempts = 5
+
+    // App lifecycle tracking
+    private var isAppInForeground = true
+
+    // Room recovery tracking
+    private var isAttemptingRoomRecovery = false
 
     // Global session state
     private val _room = MutableStateFlow<RoomDto?>(null)
@@ -44,65 +57,136 @@ class SignalRService(
     private val _voteAnswers = MutableStateFlow<List<VoteAnswerDto>>(emptyList())
     val voteAnswers: StateFlow<List<VoteAnswerDto>> = _voteAnswers.asStateFlow()
 
-    private val connection: HubConnection =
-        HubConnectionBuilder.create(hubUrl).build()
+    private val connection: HubConnection = HubConnectionBuilder.create(hubUrl).build()
 
     init {
-        connection.on("RoomCreated", { room: RoomDto, me: PlayerDto ->
-            println("Room created: ${room}")
-            applyRoomAndPlayer(room, me)
-        }, RoomDto::class.java, PlayerDto::class.java)
+        connection.on(
+                "RoomCreated",
+                { room: RoomDto, me: PlayerDto ->
+                    println("Room created: ${room}")
+                    applyRoomAndPlayer(room, me)
+                },
+                RoomDto::class.java,
+                PlayerDto::class.java
+        )
 
-        connection.on("RoomJoined", { room: RoomDto, me: PlayerDto ->
-            println("Room joined: ${room}")
-            applyRoomAndPlayer(room, me)
-        }, RoomDto::class.java, PlayerDto::class.java)
+        connection.on(
+                "RoomJoined",
+                { room: RoomDto, me: PlayerDto ->
+                    println("Room joined: ${room}")
+                    applyRoomAndPlayer(room, me)
+                },
+                RoomDto::class.java,
+                PlayerDto::class.java
+        )
 
-        connection.on("RoomUpdated", { room: RoomDto ->
-            println("Room updated: ${room}")
-            applyRoom(room)
-            refreshSelfFrom(room)
+        connection.on(
+                "RoomUpdated",
+                { room: RoomDto ->
+                    println("Room updated: ${room}")
+                    applyRoom(room)
+                    refreshSelfFrom(room)
 
-            kotlinx.coroutines.GlobalScope.launch {
-                delay(500)
-                _isUpdatingSettings.value = false
-            }
-        }, RoomDto::class.java)
+                    kotlinx.coroutines.GlobalScope.launch {
+                        delay(500)
+                        _isUpdatingSettings.value = false
+                    }
+                },
+                RoomDto::class.java
+        )
 
-        connection.on("RoundStarted", { room: RoomDto ->
-            println("Round started: ${room}")
-            applyRoom(room)
-        }, RoomDto::class.java)
+        connection.on(
+                "RoundStarted",
+                { room: RoomDto ->
+                    println("Round started: ${room}")
+                    applyRoom(room)
+                },
+                RoomDto::class.java
+        )
 
-        connection.on("RoundStopped", {
-            println("Round stopped")
-            // applyRoom(room)
-            // Trigger automatic answer submission
-            _shouldSubmitAnswers.value = true
-        })
+        connection.on(
+                "RoundStopped",
+                {
+                    println("Round stopped")
+                    // applyRoom(room)
+                    // Trigger automatic answer submission
+                    _shouldSubmitAnswers.value = true
+                }
+        )
 
-        connection.on("VoteStarted", { voteAnswers: Array<VoteAnswerDto> ->
-            println("Vote started with ${voteAnswers.size} topics")
-            _voteAnswers.value = voteAnswers.toList()
-        }, Array<VoteAnswerDto>::class.java)
+        connection.on(
+                "VoteStarted",
+                { voteAnswers: Array<VoteAnswerDto> ->
+                    println("Vote started with ${voteAnswers.size} topics")
+                    _voteAnswers.value = voteAnswers.toList()
+                },
+                Array<VoteAnswerDto>::class.java
+        )
 
-        connection.on("VoteUpdate", { voteAnswers: Array<VoteAnswerDto> ->
-            println("Vote updated")
-            _voteAnswers.value = voteAnswers.toList()
-        }, Array<VoteAnswerDto>::class.java)
+        connection.on(
+                "VoteUpdate",
+                { voteAnswers: Array<VoteAnswerDto> ->
+                    println("Vote updated")
+                    _voteAnswers.value = voteAnswers.toList()
+                },
+                Array<VoteAnswerDto>::class.java
+        )
+
+        // Room reconnection response handler
+        connection.on(
+                "RoomReconnected",
+                { room: RoomDto, me: PlayerDto ->
+                    println("Room reconnected successfully: ${room.code}")
+                    applyRoomAndPlayer(room, me)
+                    // Clear room recovery flag on successful reconnection
+                    isAttemptingRoomRecovery = false
+                },
+                RoomDto::class.java,
+                PlayerDto::class.java
+        )
 
         // Error channel
-        connection.on("Error", { errorMsg: String ->
-            _error.value = errorMsg
-            _isUpdatingSettings.value = false
-        }, String::class.java)
+        connection.on(
+                "Error",
+                { errorMsg: String ->
+                    println("❌ SignalR Error received: $errorMsg")
+
+                    // Check if this error is related to room recovery
+                    if (isAttemptingRoomRecovery && (errorMsg.contains("Room not found", ignoreCase = true))
+                    ) {
+                        println("🔄 Room recovery failed - room no longer exists, clearing room data")
+                        clearRoomData()
+                        isAttemptingRoomRecovery = false
+                        // Don't set this as a user-facing error since it's expected behavior
+                    } else {
+                        // Regular error handling
+                        _error.value = errorMsg
+                        _isUpdatingSettings.value = false
+                    }
+                },
+                String::class.java
+        )
 
         // Connection closed handler
         connection.onClosed { exception ->
             println("🔌 SignalR connection closed: ${exception?.message ?: "Unknown reason"}")
-            // Clear room data when connection is lost to prevent stale state
-            if (_room.value != null) {
-                // TODO: reconnection
+            println("🔌 App in foreground: $isAppInForeground")
+
+            // Only attempt reconnection if we were previously connected (not during initial
+            // connection)
+            if (_connectionState.value == ConnectionState.Connected) {
+                if (isAppInForeground) {
+                    // App is in foreground - attempt reconnection immediately
+                    updateConnectionState(ConnectionState.Reconnecting)
+                    kotlinx.coroutines.GlobalScope.launch { attemptReconnection() }
+                } else {
+                    // App is in background - don't reconnect to save battery
+                    println("🔌 App in background, skipping reconnection to save battery")
+                    updateConnectionState(ConnectionState.Disconnected)
+                }
+            } else if (_connectionState.value == ConnectionState.Connecting) {
+                // If connection was lost during initial connection attempt, set to Failed
+                updateConnectionState(ConnectionState.Failed)
             }
         }
     }
@@ -112,9 +196,21 @@ class SignalRService(
     suspend fun connect() {
         withContext(Dispatchers.IO) {
             try {
+                // Set state to Connecting before attempting connection
+                updateConnectionState(ConnectionState.Connecting)
+
                 connection.start().blockingAwait()
+
+                // Reset reconnection attempts on successful initial connection
+                reconnectAttempts = 0
+
+                // Set state to Connected on successful connection
+                updateConnectionState(ConnectionState.Connected)
                 println("✅ SignalR connected")
+                handleRoomRecovery()
             } catch (e: Exception) {
+                // Set state to Failed on connection failure
+                updateConnectionState(ConnectionState.Failed)
                 println("❌ Failed to connect: ${e.message}")
                 throw e
             }
@@ -138,13 +234,14 @@ class SignalRService(
             _isUpdatingSettings.value = true
             _error.value = null
 
-            val updateRequest = UpdateRoomSettingsRequest(
-                maxPlayers = roomSettings.maxPlayers,
-                maxRounds = roomSettings.maxRounds,
-                roundDurationSeconds = roomSettings.roundDurationSeconds,
-                votingDurationSeconds = roomSettings.votingDurationSeconds,
-                topics = roomSettings.topics.map { it.name }
-            )
+            val updateRequest =
+                    UpdateRoomSettingsRequest(
+                            maxPlayers = roomSettings.maxPlayers,
+                            maxRounds = roomSettings.maxRounds,
+                            roundDurationSeconds = roomSettings.roundDurationSeconds,
+                            votingDurationSeconds = roomSettings.votingDurationSeconds,
+                            topics = roomSettings.topics.map { it.name }
+                    )
             connection.send("UpdateRoomSettings", currentRoom.code, updateRequest)
         } catch (e: Exception) {
             println("❌ Failed to update room settings: ${e.message}")
@@ -220,7 +317,163 @@ class SignalRService(
         }
     }
 
+    suspend fun disconnect() {
+        withContext(Dispatchers.IO) {
+            try {
+                println("🔌 Disconnecting SignalR connection...")
+
+                // Stop the SignalR connection
+                connection.stop().blockingAwait()
+
+                // Clear all room data on explicit disconnect
+                clearRoomData()
+
+                // Set connection state to Disconnected after successful disconnect
+                updateConnectionState(ConnectionState.Disconnected)
+
+                println("✅ SignalR disconnected successfully")
+            } catch (e: Exception) {
+                println("❌ Failed to disconnect: ${e.message}")
+                _error.value = "Failed to disconnect: ${e.message}"
+
+                // Even if disconnect fails, still clear room data and set state
+                clearRoomData()
+                updateConnectionState(ConnectionState.Disconnected)
+
+                throw e
+            }
+        }
+    }
+
+    fun setAppInForeground(inForeground: Boolean) {
+        isAppInForeground = inForeground
+        println("🔌 App lifecycle changed: ${if (inForeground) "FOREGROUND" else "BACKGROUND"}")
+
+        if (inForeground) {
+            // App came back to foreground
+            when (_connectionState.value) {
+                ConnectionState.Disconnected -> {
+                    // Try to reconnect when app returns to foreground
+                    println("🔌 App returned to foreground, attempting to reconnect")
+                    kotlinx.coroutines.GlobalScope.launch {
+                        try {
+                            connect()
+                        } catch (e: Exception) {
+                            println("❌ Failed to reconnect on foreground: ${e.message}")
+                        }
+                    }
+                }
+                ConnectionState.Failed -> {
+                    println(
+                            "🔌 App returned to foreground, connection was failed - ready for manual retry"
+                    )
+                }
+                else -> {
+                    println(
+                            "🔌 App returned to foreground, connection state: ${_connectionState.value}"
+                    )
+                }
+            }
+        }
+    }
+
     // --- Internals ---
+
+    private fun updateConnectionState(state: ConnectionState) {
+        _connectionState.value = state
+        println("🔌 Connection state updated to: $state")
+    }
+
+    private suspend fun attemptReconnection() {
+        withContext(Dispatchers.IO) {
+            while (reconnectAttempts < maxReconnectAttempts && isAppInForeground) {
+                try {
+                    reconnectAttempts++
+
+                    println("🔄 Attempting reconnection #$reconnectAttempts/$maxReconnectAttempts")
+
+                    // Calculate exponential backoff delay (2000ms * attempts)
+                    val delayMs = 2000L * reconnectAttempts
+                    delay(delayMs)
+
+                    // Check again if app is still in foreground after delay
+                    if (!isAppInForeground) {
+                        println("🔌 App went to background during reconnection, stopping attempts")
+                        updateConnectionState(ConnectionState.Disconnected)
+                        return@withContext
+                    }
+
+                    // Attempt to reconnect
+                    connection.start().blockingAwait()
+
+                    // Reset attempt counter on successful reconnection
+                    reconnectAttempts = 0
+                    updateConnectionState(ConnectionState.Connected)
+                    println("✅ Reconnection successful")
+
+                    // Attempt room recovery if we have active room data
+                    handleRoomRecovery()
+
+                    return@withContext
+                } catch (e: Exception) {
+                    println("❌ Reconnection attempt #$reconnectAttempts failed: ${e.message}")
+
+                    if (reconnectAttempts >= maxReconnectAttempts) {
+                        updateConnectionState(ConnectionState.Failed)
+                        println("❌ Max reconnection attempts exceeded, connection failed")
+                        return@withContext
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun handleRoomRecovery() {
+        withContext(Dispatchers.IO) {
+            try {
+                val currentRoom = _room.value
+                val currentPlayer = _player.value
+
+                // Check if we have room and player data to recover
+                if (currentRoom == null || currentPlayer == null) {
+                    println("🔄 No room data to recover")
+                    return@withContext
+                }
+
+                // Check if room state is not Finished before attempting recovery
+                val roomState = RoomState.fromValue(currentRoom.state)
+                if (roomState == RoomState.Finished) {
+                    println("🔄 Room is finished, skipping recovery")
+                    clearRoomData()
+                    return@withContext
+                }
+
+                println(
+                        "🔄 Attempting room recovery for room: ${currentRoom.code}, player: ${currentPlayer.id}"
+                )
+
+                // Set flag to track room recovery attempt
+                isAttemptingRoomRecovery = true
+
+                // Create reconnection request with current room code and player ID
+                val reconnectRequest =
+                        ReconnectRoomRequest(
+                                roomCode = currentRoom.code,
+                                playerId = currentPlayer.id
+                        )
+
+                // Invoke ReconnectRoom server method
+                connection.send("ReconnectRoom", reconnectRequest)
+                println("✅ Room recovery request sent")
+            } catch (e: Exception) {
+                println("❌ Room recovery failed: ${e.message}")
+                // Clear room data and return to home screen on recovery failure
+                clearRoomData()
+                isAttemptingRoomRecovery = false
+                _error.value = "Failed to recover room session: ${e.message}"
+            }
+        }
+    }
 
     private fun clearRoomData() {
         _room.value = null
@@ -245,8 +498,8 @@ class SignalRService(
     }
 
     /**
-     * Keep the same player identity and refresh its fields from the latest room snapshot.
-     * Safe no-op if we don't yet know who we are.
+     * Keep the same player identity and refresh its fields from the latest room snapshot. Safe
+     * no-op if we don't yet know who we are.
      */
     private fun refreshSelfFrom(room: RoomDto) {
         val current = _player.value ?: return

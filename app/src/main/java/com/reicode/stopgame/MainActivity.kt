@@ -1,11 +1,11 @@
 package com.reicode.stopgame
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,8 +19,8 @@ import androidx.lifecycle.lifecycleScope
 import com.reicode.stopgame.navigation.AppNav
 import com.reicode.stopgame.realtime.SignalRService
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -42,26 +42,47 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            val gradient = Brush.verticalGradient(
-                colors = listOf(
-                    Color(0xFF1E3A8A),
-                    Color(0xFF3B82F6),
-                    Color.White
-                ),
-            )
+            val gradient =
+                    Brush.verticalGradient(
+                            colors = listOf(Color(0xFF1E3A8A), Color(0xFF3B82F6), Color.White),
+                    )
 
-            Scaffold(
-                contentWindowInsets = WindowInsets.safeDrawing
-            ) { innerPadding ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(gradient)
-                        .padding(innerPadding)
-                ) {
+            Scaffold(contentWindowInsets = WindowInsets.safeDrawing) { innerPadding ->
+                Box(modifier = Modifier.fillMaxSize().background(gradient).padding(innerPadding)) {
                     AppNav(signalRService)
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Notify SignalR service that app is in foreground
+        signalRService.setAppInForeground(true)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Notify SignalR service that app is in background
+        signalRService.setAppInForeground(false)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Backup disconnect when activity is being destroyed
+        lifecycleScope.launch {
+            try {
+                signalRService.disconnect()
+                println("🔌 Disconnected due to activity destroy")
+            } catch (e: Exception) {
+                println("❌ Failed to disconnect on app destroy: ${e.message}")
+            }
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // Handle configuration changes (like screen rotation) without disconnecting
+        println("🔄 Configuration changed - SignalR connection maintained")
     }
 }

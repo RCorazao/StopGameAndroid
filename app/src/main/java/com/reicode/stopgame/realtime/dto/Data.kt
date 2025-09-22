@@ -4,6 +4,8 @@ data class CreateRoomRequest(val hostName: String)
 
 data class JoinRoomRequest(val roomCode: String, val playerName: String)
 
+data class ReconnectRoomRequest(val roomCode: String, val playerId: String)
+
 data class UpdateRoomSettingsRequest(
         val maxPlayers: Int,
         val maxRounds: Int,
