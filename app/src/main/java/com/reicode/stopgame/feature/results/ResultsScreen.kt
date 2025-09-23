@@ -13,10 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.reicode.stopgame.R
 import com.reicode.stopgame.realtime.dto.PlayerDto
 import com.reicode.stopgame.realtime.dto.RoomDto
 import com.reicode.stopgame.shared.GameScreenLayout
@@ -36,7 +38,7 @@ fun ResultsScreen(
             room = room,
             currentPlayer = currentPlayer,
             onLeaveRoom = onLeaveRoom,
-            statusText = "Round $currentRoundNumber of $maxRounds completed"
+            statusText = stringResource(R.string.round_completed_status, currentRoundNumber, maxRounds)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             // Round Summary Card
@@ -72,13 +74,13 @@ private fun RoundSummaryCard(currentRound: Int, maxRounds: Int) {
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                    text = "Round $currentRound Results",
+                    text = stringResource(R.string.round_results, currentRound),
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                     color = Color(0xFF1F2937)
             )
             Text(
-                    text = if (currentRound >= maxRounds) "Final Results!" else "Round completed",
+                    text = if (currentRound >= maxRounds) stringResource(R.string.final_results) else stringResource(R.string.round_completed),
                     fontSize = 14.sp,
                     color = Color(0xFF6B7280)
             )
@@ -95,7 +97,7 @@ private fun LeaderboardCard(players: List<PlayerDto>, currentPlayer: PlayerDto?)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
-                    text = "Leaderboard",
+                    text = stringResource(R.string.leaderboard),
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
                     color = Color(0xFF1F2937),
@@ -181,7 +183,7 @@ private fun PlayerRankItem(player: PlayerDto, rank: Int, isCurrentPlayer: Boolea
                         )
                         if (isCurrentPlayer) {
                             Text(
-                                    text = "(You)",
+                                    text = stringResource(R.string.you_parentheses),
                                     fontSize = 12.sp,
                                     color = Color(0xFF3B82F6),
                                     fontWeight = FontWeight.Medium
@@ -189,7 +191,7 @@ private fun PlayerRankItem(player: PlayerDto, rank: Int, isCurrentPlayer: Boolea
                         }
                         if (player.isHost) {
                             Text(
-                                    text = "HOST",
+                                    text = stringResource(R.string.host_label),
                                     fontSize = 10.sp,
                                     color = Color(0xFF059669),
                                     fontWeight = FontWeight.Bold,
@@ -206,9 +208,9 @@ private fun PlayerRankItem(player: PlayerDto, rank: Int, isCurrentPlayer: Boolea
                         Text(
                                 text =
                                         when (rank) {
-                                            1 -> "🥇 First place!"
-                                            2 -> "🥈 Second place"
-                                            3 -> "🥉 Third place"
+                                            1 -> stringResource(R.string.first_place)
+                                            2 -> stringResource(R.string.second_place)
+                                            3 -> stringResource(R.string.third_place)
                                             else -> ""
                                         },
                                 fontSize = 12.sp,
@@ -220,7 +222,7 @@ private fun PlayerRankItem(player: PlayerDto, rank: Int, isCurrentPlayer: Boolea
 
             // Score
             Text(
-                    text = "${player.score} pts",
+                    text = stringResource(R.string.points_short, player.score),
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
                     color = Color(0xFF1F2937)
@@ -241,7 +243,7 @@ private fun NextRoundCard(nextRoundNumber: Int, onStartRound: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                    text = "Host Controls",
+                    text = stringResource(R.string.host_controls),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = Color(0xFF1F2937),
@@ -264,7 +266,7 @@ private fun NextRoundCard(nextRoundNumber: Int, onStartRound: () -> Unit) {
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                        text = "Start Round $nextRoundNumber",
+                        text = stringResource(R.string.start_round_number, nextRoundNumber),
                         fontWeight = FontWeight.Medium,
                         fontSize = 16.sp
                 )

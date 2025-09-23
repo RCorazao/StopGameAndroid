@@ -7,10 +7,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.reicode.stopgame.R
 import com.reicode.stopgame.realtime.dto.PlayerDto
 import com.reicode.stopgame.realtime.dto.RoomDto
 import com.reicode.stopgame.shared.GameScreenLayout
@@ -67,7 +69,7 @@ fun PlayingScreen(
         room = room,
         currentPlayer = currentPlayer,
         onLeaveRoom = onLeaveRoom,
-        statusText = "Round $roundNumber • Letter $currentLetter"
+        statusText = stringResource(R.string.status_round_letter, roundNumber, currentLetter)
     ) {
         // Round Info and Timer Card
         Card(
@@ -84,7 +86,7 @@ fun PlayingScreen(
             ) {
                 Column {
                     Text(
-                        text = "Round $roundNumber: $currentLetter",
+                        text = stringResource(R.string.round_info, roundNumber, currentLetter),
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp,
                         color = Color(0xFF1F2937)
@@ -95,7 +97,7 @@ fun PlayingScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "⏰",
+                        text = stringResource(R.string.time_remaining),
                         fontSize = 18.sp
                     )
                     Spacer(Modifier.width(8.dp))
@@ -135,7 +137,7 @@ fun PlayingScreen(
                             },
                             placeholder = { 
                                 Text(
-                                    text = "${currentLetter}...",
+                                    text = stringResource(R.string.topic_placeholder, currentLetter),
                                     color = Color(0xFF9CA3AF)
                                 )
                             },
@@ -184,7 +186,7 @@ fun PlayingScreen(
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        "Stop Round",
+                        stringResource(R.string.stop_round),
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         modifier = Modifier.padding(vertical = 4.dp)
@@ -194,7 +196,7 @@ fun PlayingScreen(
                 if (!allTopicsFilled) {
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "Fill in all topics to submit",
+                        stringResource(R.string.fill_all_topics),
                         fontSize = 12.sp,
                         color = Color(0xFF6B7280),
                         textAlign = TextAlign.Center

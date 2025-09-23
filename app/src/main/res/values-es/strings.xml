@@ -1,0 +1,178 @@
+<resources>
+    <string name="app_name">StopGame</string>
+    
+    <!-- Home Screen -->
+    <string name="home_title">Stop Game</string>
+    <string name="home_subtitle">Juego de palabras</string>
+    <string name="home_create_room">Crear Sala</string>
+    <string name="home_join_room">Unirse a Sala</string>
+    
+    <!-- Room Management -->
+    <string name="room_code_label">Sala: %1$s</string>
+    <string name="room_players_status">%1$d / %2$d jugadores • %3$s</string>
+    <string name="leave_room">Salir de la Sala</string>
+    
+    <!-- Game States -->
+    <string name="status_waiting_players">Esperando jugadores</string>
+    <string name="status_round_letter">Ronda %1$d • Letra %2$s</string>
+    <string name="status_voting">Votación en progreso</string>
+    <string name="status_results">Resultados de la ronda</string>
+    <string name="status_finished">Juego terminado</string>
+    
+    <!-- Playing Screen -->
+    <string name="round_info">Ronda %1$d: %2$s</string>
+    <string name="time_remaining">⏰</string>
+    <string name="stop_round">Parar Ronda</string>
+    <string name="fill_all_topics">Completa todos los temas para enviar</string>
+    <string name="topic_placeholder">%1$s...</string>
+    
+    <!-- Results Screen -->
+    <string name="round_winner">🏆 Ganador de la Ronda</string>
+    <string name="current_standings">Clasificación Actual</string>
+    <string name="start_next_round">Iniciar Siguiente Ronda</string>
+    <string name="view_final_results">Ver Resultados Finales</string>
+    
+    <!-- Finished Screen -->
+    <string name="game_winner">🏆 ¡Ganador del Juego!</string>
+    <string name="final_standings">Clasificación Final</string>
+    <string name="total_rounds">Rondas Totales: %1$d</string>
+    <string name="congratulations">¡Felicitaciones!</string>
+    
+    <!-- Chat -->
+    <string name="chat">Chat</string>
+    <string name="chat_placeholder">Escribe un mensaje...</string>
+    <string name="chat_empty">Aún no hay mensajes.</string>
+    <string name="chat_close">Cerrar chat</string>
+    <string name="chat_send">Enviar mensaje</string>
+    <string name="chat_open">Abrir chat</string>
+    <string name="chat_system">Sistema</string>
+    <string name="chat_unknown">Desconocido</string>
+    
+    <!-- Room Settings -->
+    <string name="room_settings">Configuración de Sala</string>
+    <string name="max_players">Máximo de Jugadores</string>
+    <string name="max_rounds">Máximo de Rondas</string>
+    <string name="round_duration">Duración de Ronda (segundos)</string>
+    <string name="voting_duration">Duración de Votación (segundos)</string>
+    <string name="topics">Temas</string>
+    <string name="no_topics_added">Aún no se han agregado temas</string>
+    <string name="save_settings">Guardar Configuración</string>
+    <string name="cancel">Cancelar</string>
+    
+    <!-- Dialogs -->
+    <string name="create_room_title">Crear Sala</string>
+    <string name="join_room_title">Unirse a Sala</string>
+    <string name="player_name">Nombre del Jugador</string>
+    <string name="room_code">Código de Sala</string>
+    <string name="create">Crear</string>
+    <string name="join">Unirse</string>
+    
+    <!-- Common -->
+    <string name="loading">Cargando...</string>
+    <string name="error">Error</string>
+    <string name="ok">OK</string>
+    <string name="score">Puntuación: %1$d</string>
+    <string name="points">%1$d pts</string>
+    
+    <!-- Home Screen Additional -->
+    <string name="ready_to_play">▶ ¿Listo para Jugar?</string>
+    <string name="enter_name_instruction">Ingresa tu nombre y crea o únete a una sala</string>
+    <string name="create_room_description">Serás el anfitrión y podrás elegir los temas.\nEl código de sala se generará automáticamente.</string>
+    <string name="how_to_play">Cómo Jugar</string>
+    <string name="rule_1">• Cada ronda comienza con una letra aleatoria</string>
+    <string name="rule_2">• Completa palabras para cada tema que comiencen con esa letra</string>
+    <string name="rule_3">• Vota por las respuestas de otros jugadores</string>
+    <string name="rule_4">• Gana puntos por respuestas únicas y válidas</string>
+    
+    <!-- Lobby Screen -->
+    <string name="you">Tú</string>
+    <string name="host">Anfitrión</string>
+    <string name="edit_settings">Editar</string>
+    <string name="start_game">Iniciar Juego</string>
+    <string name="need_players">Se necesitan al menos 2 jugadores para comenzar</string>
+    <string name="edit_room_settings">Editar Configuración de Sala</string>
+    
+    <!-- Room Settings Dialog -->
+    <string name="enter_topic_name">Ingresa el tema</string>
+    <string name="add_topic">Agregar tema</string>
+    <string name="max_characters">Máx 40 caracteres</string>
+    
+    <!-- Validation Messages -->
+    <string name="max_players_min">El máximo de jugadores debe ser al menos %1$d</string>
+    <string name="max_players_max">El máximo de jugadores no puede exceder %1$d</string>
+    <string name="max_rounds_min">El máximo de rondas debe ser al menos %1$d</string>
+    <string name="max_rounds_max">El máximo de rondas no puede exceder %1$d</string>
+    <string name="round_duration_min">La duración de ronda debe ser al menos %1$d segundos</string>
+    <string name="round_duration_max">La duración de ronda no puede exceder %1$d segundos</string>
+    <string name="voting_duration_min">La duración de votación debe ser al menos %1$d segundos</string>
+    <string name="voting_duration_max">La duración de votación no puede exceder %1$d segundos</string>
+    <string name="topic_name_empty">El nombre del tema no puede estar vacío</string>
+    <string name="topic_name_too_long">El nombre del tema no puede exceder %1$d caracteres</string>
+    <string name="topic_name_exists">El nombre del tema ya existe</string>
+    <string name="min_topics_required">Se requiere al menos %1$d tema</string>
+    <string name="topic_not_found">Tema no encontrado en la lista actual</string>
+    
+    <!-- Results Screen -->
+    <string name="first_place">🥇 ¡Primer lugar!</string>
+    <string name="second_place">🥈 Segundo lugar</string>
+    <string name="third_place">🥉 Tercer lugar</string>
+    <string name="host_controls">Controles del Anfitrión</string>
+    
+    <!-- Voting Screen -->
+    <string name="finish_voting_phase">Finalizar Fase de Votación</string>
+    <string name="vote_answers">Votar las respuestas</string>
+    <string name="load_vote_data">Cargando datos de votos…</string>
+    <string name="your_answer">Tu respuesta</string>
+    <string name="valid_votes">Votos válidos</string>
+    <string name="invalid_votes">Votos inválidos</string>
+    <string name="valid_vote">Voto válido</string>
+    <string name="invalid_vote">Voto inválido</string>
+    <string name="valid">valido</string>
+    <string name="invalid">invalido</string>
+    <string name="host_control">Controles de anfitrión</string>
+    
+    <!-- Lobby Screen Additional -->
+    <string name="players">Jugadores</string>
+    <string name="max_players_label">Máx Jugadores</string>
+    <string name="max_rounds_label">Máx Rondas</string>
+    <string name="round_duration_label">Duración de Ronda</string>
+    <string name="voting_duration_label">Duración de Votación</string>
+    <string name="topics_label">Temas</string>
+    <string name="host_ready_message">Eres el anfitrión. ¡Inicia la primera ronda cuando estés listo!</string>
+    
+    <!-- Room Settings Dialog Additional -->
+    <string name="saving">Guardando...</string>
+    <string name="save">Guardar</string>
+    <string name="remove_topic_title">Eliminar Tema</string>
+    <string name="remove_topic_message">¿Estás seguro de que quieres eliminar \"%1$s\"?</string>
+    <string name="remove">Eliminar</string>
+    <string name="range_label">Rango: %1$d - %2$d</string>
+    <string name="increase_label">Aumentar %1$s</string>
+    <string name="remove_topic_description">Eliminar %1$s</string>
+    
+    <!-- Results Screen Additional -->
+    <string name="round_completed_status">Ronda %1$d de %2$d completada</string>
+    <string name="round_results">Resultados de la Ronda %1$d</string>
+    <string name="final_results">¡Resultados Finales!</string>
+    <string name="round_completed">Ronda completada</string>
+    <string name="leaderboard">Tabla de Posiciones</string>
+    <string name="you_parentheses">(Tú)</string>
+    <string name="host_label">ANFITRIÓN</string>
+    <string name="points_short">%1$d pts</string>
+    <string name="start_round_number">Iniciar Ronda %1$d</string>
+    
+    <!-- Finished Screen -->
+    <string name="game_completed_status">Juego completado - %1$d rondas jugadas</string>
+    <string name="winner_announcement">🎉 ¡GANADOR! 🎉</string>
+    <string name="congratulations_winner">¡Felicitaciones! ¡Ganaste! 🏆</string>
+    <string name="congratulations_other">¡Felicitaciones al ganador! 👏</string>
+    <string name="points_caps">%1$d PUNTOS</string>
+    <string name="champion">🏆 ¡Campeón!</string>
+    <string name="runner_up">🥈 Subcampeón</string>
+    <string name="third_place_final">🥉 Tercer lugar</string>
+    <string name="great_game">¡Buen juego!</string>
+    <string name="game_summary">Resumen del Juego</string>
+    <string name="rounds_label">Rondas</string>
+    <string name="players_label">Jugadores</string>
+    <string name="thanks_for_playing">¡Gracias por jugar! 🎮</string>
+</resources>

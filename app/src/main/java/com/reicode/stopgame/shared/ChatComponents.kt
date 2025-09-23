@@ -18,10 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.reicode.stopgame.R
 import com.reicode.stopgame.realtime.dto.ChatMessageDto
 import kotlinx.coroutines.launch
 
@@ -45,36 +47,31 @@ fun ChatPanel(
     }
 
     Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
-        color = Color.White,
-        shadowElevation = 8.dp
+            modifier = modifier,
+            shape = RoundedCornerShape(16.dp),
+            color = Color.White,
+            shadowElevation = 8.dp
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Header
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Chat",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Black
+                        text = stringResource(R.string.chat),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.Black
                 )
-                
-                IconButton(
-                    onClick = onClose,
-                    modifier = Modifier.size(24.dp)
-                ) {
+
+                IconButton(onClick = onClose, modifier = Modifier.size(24.dp)) {
                     Icon(
-                        Icons.Default.Close,
-                        contentDescription = "Close chat",
-                        tint = Color.Gray,
-                        modifier = Modifier.size(20.dp)
+                            Icons.Default.Close,
+                            contentDescription = stringResource(R.string.chat_close),
+                            tint = Color.Gray,
+                            modifier = Modifier.size(20.dp)
                     )
                 }
             }
@@ -85,93 +82,78 @@ fun ChatPanel(
             if (messages.isEmpty()) {
                 // Empty state
                 Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
+                        modifier = Modifier.weight(1f).fillMaxWidth(),
+                        contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "No messages yet.",
-                        color = Color.Gray,
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center
+                            text = stringResource(R.string.chat_empty),
+                            color = Color.Gray,
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center
                     )
                 }
             } else {
                 LazyColumn(
-                    state = listState,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(vertical = 16.dp)
-                ) {
-                    items(messages) { message ->
-                        ChatMessageItem(message = message)
-                    }
-                }
+                        state = listState,
+                        modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(vertical = 16.dp)
+                ) { items(messages) { message -> ChatMessageItem(message = message) } }
             }
 
             HorizontalDivider(color = Color.Gray.copy(alpha = 0.2f))
 
             // Message input
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp),
-                verticalAlignment = Alignment.Bottom
+                    modifier = Modifier.fillMaxWidth().padding(10.dp),
+                    verticalAlignment = Alignment.Bottom
             ) {
                 OutlinedTextField(
-                    value = messageText,
-                    onValueChange = { messageText = it },
-                    placeholder = {
-                        Text(
-                            "Type a message...",
-                            color = Color.Gray
-                        )
-                    },
-                    modifier = Modifier
-                        .weight(1f),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.Transparent,
-                        unfocusedBorderColor = Color.Transparent,
-                        focusedContainerColor = Color.Gray.copy(alpha = 0.1f),
-                        unfocusedContainerColor = Color.Gray.copy(alpha = 0.1f)
-                    ),
-                    maxLines = 3,
+                        value = messageText,
+                        onValueChange = { messageText = it },
+                        placeholder = {
+                            Text(stringResource(R.string.chat_placeholder), color = Color.Gray)
+                        },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(12.dp),
+                        colors =
+                                OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Color.Transparent,
+                                        unfocusedBorderColor = Color.Transparent,
+                                        focusedContainerColor = Color.Gray.copy(alpha = 0.1f),
+                                        unfocusedContainerColor = Color.Gray.copy(alpha = 0.1f)
+                                ),
+                        maxLines = 3,
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
 
                 // Send button - rectangular with rounded corners
                 Box(
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(
-                            if (messageText.isNotBlank())
-                                Color.Gray.copy(alpha = 0.8f)
-                            else
-                                Color.Gray.copy(alpha = 0.3f)
-                        ),
-                    contentAlignment = Alignment.Center
+                        modifier =
+                                Modifier.size(56.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(
+                                                if (messageText.isNotBlank())
+                                                        Color.Gray.copy(alpha = 0.8f)
+                                                else Color.Gray.copy(alpha = 0.3f)
+                                        ),
+                        contentAlignment = Alignment.Center
                 ) {
                     IconButton(
-                        onClick = {
-                            if (messageText.isNotBlank()) {
-                                onSendMessage(messageText.trim())
-                                messageText = ""
-                            }
-                        },
-                        enabled = messageText.isNotBlank()
+                            onClick = {
+                                if (messageText.isNotBlank()) {
+                                    onSendMessage(messageText.trim())
+                                    messageText = ""
+                                }
+                            },
+                            enabled = messageText.isNotBlank()
                     ) {
                         Icon(
-                            Icons.Default.Send,
-                            contentDescription = "Send message",
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
+                                Icons.Default.Send,
+                                contentDescription = stringResource(R.string.chat_send),
+                                tint = Color.White,
+                                modifier = Modifier.size(20.dp)
                         )
                     }
                 }
@@ -181,39 +163,36 @@ fun ChatPanel(
 }
 
 @Composable
-fun ChatMessageItem(
-    message: ChatMessageDto,
-    modifier: Modifier = Modifier
-) {
+fun ChatMessageItem(message: ChatMessageDto, modifier: Modifier = Modifier) {
     val isSystemMessage = message.source == "System"
 
     Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 1.dp),
-        shape = RoundedCornerShape(12.dp),
-        color = Color.White,
-        tonalElevation = 2.dp,
-        shadowElevation = 2.dp
+            modifier = modifier.fillMaxWidth().padding(vertical = 1.dp),
+            shape = RoundedCornerShape(12.dp),
+            color = Color.White,
+            tonalElevation = 2.dp,
+            shadowElevation = 2.dp
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             // Sender name + timestamp
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = if (isSystemMessage) "System" else message.player?.name ?: "Unknown",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = if (isSystemMessage) Color(0xFF2563EB) else Color.Black
+                        text =
+                                if (isSystemMessage) stringResource(R.string.chat_system)
+                                else message.player?.name ?: stringResource(R.string.chat_unknown),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = if (isSystemMessage) Color(0xFF2563EB) else Color.Black
                 )
 
                 Text(
-                    text = formatTimestamp(message.timestamp),
-                    fontSize = 11.sp,
-                    color = Color.Gray
+                        text = formatTimestamp(message.timestamp),
+                        fontSize = 11.sp,
+                        color = Color.Gray
                 )
             }
 
@@ -221,15 +200,14 @@ fun ChatMessageItem(
 
             // Message content
             Text(
-                text = message.message,
-                fontSize = 14.sp,
-                color = Color(0xFF1F2937), // dark gray text
-                lineHeight = 20.sp
+                    text = message.message,
+                    fontSize = 14.sp,
+                    color = Color(0xFF1F2937), // dark gray text
+                    lineHeight = 20.sp
             )
         }
     }
 }
-
 
 private fun formatTimestamp(timestamp: String): String {
     return try {
@@ -245,12 +223,12 @@ private fun formatTimestamp(timestamp: String): String {
 
 @Composable
 fun ChatBadge(
-    messages: List<ChatMessageDto>,
-    onSendMessage: (String) -> Unit,
-    unreadCount: Int = 0,
-    onMarkAsRead: () -> Unit = {},
-    onSetChatOpen: (Boolean) -> Unit = {},
-    modifier: Modifier = Modifier
+        messages: List<ChatMessageDto>,
+        onSendMessage: (String) -> Unit,
+        unreadCount: Int = 0,
+        onMarkAsRead: () -> Unit = {},
+        onSetChatOpen: (Boolean) -> Unit = {},
+        modifier: Modifier = Modifier
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -263,51 +241,49 @@ fun ChatBadge(
 
     if (isExpanded) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.3f))
-                .clickable{ isExpanded = false }
+                modifier =
+                        Modifier.fillMaxSize()
+                                .background(Color.Black.copy(alpha = 0.3f))
+                                .clickable { isExpanded = false }
         ) {
             Box(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
-                    .clickable(enabled = false) {}
+                    modifier =
+                            Modifier.align(Alignment.BottomEnd).padding(16.dp).clickable(
+                                            enabled = false
+                                    ) {}
             ) {
                 ChatPanel(
-                    messages = messages,
-                    onSendMessage = onSendMessage,
-                    onClose = { isExpanded = false },
-                    modifier = Modifier
-                        .width(350.dp)
-                        .height(500.dp)
+                        messages = messages,
+                        onSendMessage = onSendMessage,
+                        onClose = { isExpanded = false },
+                        modifier = Modifier.width(350.dp).height(500.dp)
                 )
             }
         }
     } else {
         Box(modifier = modifier) {
             Surface(
-                onClick = { isExpanded = true },
-                shape = RoundedCornerShape(50),
-                color = Color.Black,
-                shadowElevation = 4.dp
+                    onClick = { isExpanded = true },
+                    shape = RoundedCornerShape(50),
+                    color = Color.Black,
+                    shadowElevation = 4.dp
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ChatBubbleOutline,
-                        contentDescription = "Open chat",
-                        tint = Color.White,
-                        modifier = Modifier.size(18.dp)
+                            imageVector = Icons.Default.ChatBubbleOutline,
+                            contentDescription = stringResource(R.string.chat_open),
+                            tint = Color.White,
+                            modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "Chat",
-                        color = Color.White,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 14.sp
+                            text = stringResource(R.string.chat),
+                            color = Color.White,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 14.sp
                     )
                 }
             }
@@ -315,19 +291,19 @@ fun ChatBadge(
             // Unread badge overlay
             if (unreadCount > 0) {
                 Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = 8.dp, y = (-8).dp)
-                        .size(20.dp)
-                        .clip(CircleShape)
-                        .background(Color.Red),
-                    contentAlignment = Alignment.Center
+                        modifier =
+                                Modifier.align(Alignment.TopEnd)
+                                        .offset(x = 8.dp, y = (-8).dp)
+                                        .size(20.dp)
+                                        .clip(CircleShape)
+                                        .background(Color.Red),
+                        contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = if (unreadCount > 9) "9+" else unreadCount.toString(),
-                        color = Color.White,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
+                            text = if (unreadCount > 9) "9+" else unreadCount.toString(),
+                            color = Color.White,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold
                     )
                 }
             }

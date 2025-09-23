@@ -1,3 +1,178 @@
 <resources>
     <string name="app_name">StopGame</string>
+    
+    <!-- Home Screen -->
+    <string name="home_title">Stop Game</string>
+    <string name="home_subtitle">Word game</string>
+    <string name="home_create_room">Create Room</string>
+    <string name="home_join_room">Join Room</string>
+    
+    <!-- Room Management -->
+    <string name="room_code_label">Room: %1$s</string>
+    <string name="room_players_status">%1$d / %2$d players • %3$s</string>
+    <string name="leave_room">Leave Room</string>
+    
+    <!-- Game States -->
+    <string name="status_waiting_players">Waiting for players</string>
+    <string name="status_round_letter">Round %1$d • Letter %2$s</string>
+    <string name="status_voting">Voting in progress</string>
+    <string name="status_results">Round results</string>
+    <string name="status_finished">Game finished</string>
+    
+    <!-- Playing Screen -->
+    <string name="round_info">Round %1$d: %2$s</string>
+    <string name="time_remaining">⏰</string>
+    <string name="stop_round">Stop Round</string>
+    <string name="fill_all_topics">Fill in all topics to submit</string>
+    <string name="topic_placeholder">%1$s...</string>
+    
+    <!-- Results Screen -->
+    <string name="round_winner">🏆 Round Winner</string>
+    <string name="current_standings">Current Standings</string>
+    <string name="start_next_round">Start Next Round</string>
+    <string name="view_final_results">View Final Results</string>
+    
+    <!-- Finished Screen -->
+    <string name="game_winner">🏆 Game Winner!</string>
+    <string name="final_standings">Final Standings</string>
+    <string name="total_rounds">Total Rounds: %1$d</string>
+    <string name="congratulations">Congratulations!</string>
+    
+    <!-- Chat -->
+    <string name="chat">Chat</string>
+    <string name="chat_placeholder">Type a message...</string>
+    <string name="chat_empty">No messages yet.</string>
+    <string name="chat_close">Close chat</string>
+    <string name="chat_send">Send message</string>
+    <string name="chat_open">Open chat</string>
+    <string name="chat_system">System</string>
+    <string name="chat_unknown">Unknown</string>
+    
+    <!-- Room Settings -->
+    <string name="room_settings">Room Settings</string>
+    <string name="max_players">Max Players</string>
+    <string name="max_rounds">Max Rounds</string>
+    <string name="round_duration">Round Duration (seconds)</string>
+    <string name="voting_duration">Voting Duration (seconds)</string>
+    <string name="topics">Topics</string>
+    <string name="no_topics_added">No topics added yet</string>
+    <string name="save_settings">Save Settings</string>
+    <string name="cancel">Cancel</string>
+    
+    <!-- Dialogs -->
+    <string name="create_room_title">Create Room</string>
+    <string name="join_room_title">Join Room</string>
+    <string name="player_name">Player Name</string>
+    <string name="room_code">Room Code</string>
+    <string name="create">Create</string>
+    <string name="join">Join</string>
+    
+    <!-- Common -->
+    <string name="loading">Loading...</string>
+    <string name="error">Error</string>
+    <string name="ok">OK</string>
+    <string name="score">Score: %1$d</string>
+    <string name="points">%1$d pts</string>
+    
+    <!-- Home Screen Additional -->
+    <string name="ready_to_play">▶ Ready to Play?</string>
+    <string name="enter_name_instruction">Enter your name and create or join a room</string>
+    <string name="create_room_description">You\'ll be the host and can choose topics.\nRoom code will be generated automatically.</string>
+    <string name="how_to_play">How to Play</string>
+    <string name="rule_1">• Each round starts with a random letter</string>
+    <string name="rule_2">• Fill words for each topic starting with that letter</string>
+    <string name="rule_3">• Vote on other players\' answers</string>
+    <string name="rule_4">• Score points for unique and valid answers</string>
+    
+    <!-- Lobby Screen -->
+    <string name="you">You</string>
+    <string name="host">Host</string>
+    <string name="edit_settings">Edit</string>
+    <string name="start_game">Start Game</string>
+    <string name="need_players">Need at least 2 players to start</string>
+    <string name="edit_room_settings">Edit Room Settings</string>
+    
+    <!-- Room Settings Dialog -->
+    <string name="enter_topic_name">Enter topic</string>
+    <string name="add_topic">Add topic</string>
+    <string name="max_characters">Max 40 characters</string>
+    
+    <!-- Validation Messages -->
+    <string name="max_players_min">Maximum players must be at least %1$d</string>
+    <string name="max_players_max">Maximum players cannot exceed %1$d</string>
+    <string name="max_rounds_min">Maximum rounds must be at least %1$d</string>
+    <string name="max_rounds_max">Maximum rounds cannot exceed %1$d</string>
+    <string name="round_duration_min">Round duration must be at least %1$d seconds</string>
+    <string name="round_duration_max">Round duration cannot exceed %1$d seconds</string>
+    <string name="voting_duration_min">Voting duration must be at least %1$d seconds</string>
+    <string name="voting_duration_max">Voting duration cannot exceed %1$d seconds</string>
+    <string name="topic_name_empty">Topic name cannot be empty</string>
+    <string name="topic_name_too_long">Topic name cannot exceed %1$d characters</string>
+    <string name="topic_name_exists">Topic name already exists</string>
+    <string name="min_topics_required">At least %1$d topic is required</string>
+    <string name="topic_not_found">Topic not found in current topics list</string>
+    
+    <!-- Results Screen -->
+    <string name="first_place">🥇 First place!</string>
+    <string name="second_place">🥈 Second place</string>
+    <string name="third_place">🥉 Third place</string>
+    <string name="host_controls">Host Controls</string>
+    
+    <!-- Voting Screen -->
+    <string name="finish_voting_phase">Finish Voting Phase</string>
+    <string name="vote_answers">Vote on answers</string>
+    <string name="load_vote_data">Loading voting data…</string>
+    <string name="your_answer">Your answer</string>
+    <string name="valid_votes">Valid votes</string>
+    <string name="invalid_votes">Invalid votes</string>
+    <string name="valid_vote">Valid vote</string>
+    <string name="invalid_vote">Invalid vote</string>
+    <string name="valid">valid</string>
+    <string name="invalid">invalid</string>
+    <string name="host_control">Host Controls</string>
+
+    <!-- Lobby Screen Additional -->
+    <string name="players">Players</string>
+    <string name="max_players_label">Max Players</string>
+    <string name="max_rounds_label">Max Rounds</string>
+    <string name="round_duration_label">Round Duration</string>
+    <string name="voting_duration_label">Voting Duration</string>
+    <string name="topics_label">Topics</string>
+    <string name="host_ready_message">You are the host. Start the first round when ready!</string>
+    
+    <!-- Room Settings Dialog Additional -->
+    <string name="saving">Saving...</string>
+    <string name="save">Save</string>
+    <string name="remove_topic_title">Remove Topic</string>
+    <string name="remove_topic_message">Are you sure you want to remove \"%1$s\"?</string>
+    <string name="remove">Remove</string>
+    <string name="range_label">Range: %1$d - %2$d</string>
+    <string name="increase_label">Increase %1$s</string>
+    <string name="remove_topic_description">Remove %1$s</string>
+    
+    <!-- Results Screen Additional -->
+    <string name="round_completed_status">Round %1$d of %2$d completed</string>
+    <string name="round_results">Round %1$d Results</string>
+    <string name="final_results">Final Results!</string>
+    <string name="round_completed">Round completed</string>
+    <string name="leaderboard">Leaderboard</string>
+    <string name="you_parentheses">(You)</string>
+    <string name="host_label">HOST</string>
+    <string name="points_short">%1$d pts</string>
+    <string name="start_round_number">Start Round %1$d</string>
+    
+    <!-- Finished Screen -->
+    <string name="game_completed_status">Game completed - %1$d rounds played</string>
+    <string name="winner_announcement">🎉 WINNER! 🎉</string>
+    <string name="congratulations_winner">Congratulations! You won! 🏆</string>
+    <string name="congratulations_other">Congratulations to the winner! 👏</string>
+    <string name="points_caps">%1$d POINTS</string>
+    <string name="champion">🏆 Champion!</string>
+    <string name="runner_up">🥈 Runner-up</string>
+    <string name="third_place_final">🥉 Third place</string>
+    <string name="great_game">Great game!</string>
+    <string name="game_summary">Game Summary</string>
+    <string name="rounds_label">Rounds</string>
+    <string name="players_label">Players</string>
+    <string name="thanks_for_playing">Thanks for playing! 🎮</string>
 </resources>

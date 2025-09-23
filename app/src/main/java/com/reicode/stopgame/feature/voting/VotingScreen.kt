@@ -12,10 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.reicode.stopgame.R
 import com.reicode.stopgame.realtime.dto.AnswerDto
 import com.reicode.stopgame.realtime.dto.PlayerDto
 import com.reicode.stopgame.realtime.dto.RoomDto
@@ -35,7 +37,7 @@ fun VotingScreen(
             room = room,
             currentPlayer = currentPlayer,
             onLeaveRoom = onLeaveRoom,
-            statusText = "Vote on answers"
+            statusText = stringResource(R.string.vote_answers)
     ) {
         if (voteAnswers.isEmpty()) {
             Card(
@@ -51,7 +53,7 @@ fun VotingScreen(
                     CircularProgressIndicator(color = Color(0xFF3B82F6))
                     Spacer(Modifier.height(16.dp))
                     Text(
-                            text = "Loading voting data...",
+                            text = stringResource(R.string.load_vote_data),
                             fontSize = 16.sp,
                             color = Color(0xFF6B7280),
                             textAlign = TextAlign.Center
@@ -153,7 +155,7 @@ private fun AnswerVotingItem(
 
                 if (isOwnAnswer) {
                     Text(
-                            text = "Your answer",
+                            text = stringResource(R.string.your_answer),
                             fontSize = 12.sp,
                             color = Color(0xFF6B7280),
                             fontWeight = FontWeight.Medium
@@ -178,7 +180,7 @@ private fun AnswerVotingItem(
                         ) {
                             Icon(
                                     Icons.Default.ThumbUp,
-                                    contentDescription = "Valid votes",
+                                    contentDescription = stringResource(R.string.valid_votes),
                                     tint = Color(0xFF10B981),
                                     modifier = Modifier.size(16.dp)
                             )
@@ -196,7 +198,7 @@ private fun AnswerVotingItem(
                         ) {
                             Icon(
                                     Icons.Default.ThumbDown,
-                                    contentDescription = "Invalid votes",
+                                    contentDescription = stringResource(R.string.invalid_votes),
                                     tint = Color(0xFFEF4444),
                                     modifier = Modifier.size(16.dp)
                             )
@@ -227,7 +229,7 @@ private fun AnswerVotingItem(
                         ) {
                             Icon(
                                     Icons.Default.ThumbUp,
-                                    contentDescription = "Vote valid",
+                                    contentDescription = stringResource(R.string.valid_vote),
                                     tint =
                                             if (currentPlayerVote?.isValid == true) Color.White
                                             else Color(0xFF6B7280),
@@ -251,7 +253,7 @@ private fun AnswerVotingItem(
                         ) {
                             Icon(
                                     Icons.Default.ThumbDown,
-                                    contentDescription = "Vote invalid",
+                                    contentDescription = stringResource(R.string.invalid_vote),
                                     tint =
                                             if (currentPlayerVote?.isValid == false) Color.White
                                             else Color(0xFF6B7280),
@@ -270,12 +272,12 @@ private fun AnswerVotingItem(
                     ) {
                         Icon(
                                 Icons.Default.ThumbUp,
-                                contentDescription = "Valid votes",
+                                contentDescription = stringResource(R.string.valid_votes),
                                 tint = Color(0xFF10B981),
                                 modifier = Modifier.size(16.dp)
                         )
                         Text(
-                                text = "$validVotes valid",
+                                text = "$validVotes " + stringResource(R.string.valid),
                                 fontSize = 14.sp,
                                 color = Color(0xFF10B981),
                                 fontWeight = FontWeight.Medium
@@ -288,12 +290,12 @@ private fun AnswerVotingItem(
                     ) {
                         Icon(
                                 Icons.Default.ThumbDown,
-                                contentDescription = "Invalid votes",
+                                contentDescription = stringResource(R.string.invalid_votes),
                                 tint = Color(0xFFEF4444),
                                 modifier = Modifier.size(16.dp)
                         )
                         Text(
-                                text = "$invalidVotes invalid",
+                                text = "$invalidVotes " + stringResource(R.string.invalid),
                                 fontSize = 14.sp,
                                 color = Color(0xFFEF4444),
                                 fontWeight = FontWeight.Medium
@@ -317,7 +319,7 @@ private fun FinishVotingPhaseCard(onFinishVotingPhase: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                    text = "Host Controls",
+                    text = stringResource(R.string.host_control),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = Color(0xFF1F2937),
@@ -339,7 +341,7 @@ private fun FinishVotingPhaseCard(onFinishVotingPhase: () -> Unit) {
                         modifier = Modifier.size(18.dp)
                 )
                 Spacer(Modifier.width(8.dp))
-                Text(text = "Finish Voting Phase", fontWeight = FontWeight.Medium, fontSize = 16.sp)
+                Text(text = stringResource(R.string.finish_voting_phase), fontWeight = FontWeight.Medium, fontSize = 16.sp)
             }
         }
     }

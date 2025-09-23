@@ -13,10 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Button
@@ -40,12 +37,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.reicode.stopgame.R
 import com.reicode.stopgame.feature.lobby.data.RoomSettings
 import com.reicode.stopgame.feature.lobby.data.RoomSettingsValidator
 import com.reicode.stopgame.realtime.dto.TopicDto
@@ -66,6 +66,8 @@ fun RoomSettingsEditDialog(
     onDismiss: () -> Unit,
     onSave: (RoomSettings) -> Unit
 ) {
+    val context = LocalContext.current
+    
     // Dialog state management with remember and mutableStateOf for edit mode
     var editableSettings by remember { mutableStateOf(currentSettings) }
     var validationErrors by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
@@ -77,7 +79,7 @@ fun RoomSettingsEditDialog(
     
     // Update validation errors whenever settings change
     LaunchedEffect(editableSettings) {
-        validationErrors = RoomSettingsValidator.validateRoomSettings(editableSettings)
+        validationErrors = RoomSettingsValidator.validateRoomSettings(editableSettings, context)
     }
     
     BasicAlertDialog(onDismissRequest = onDismiss) {
@@ -97,7 +99,7 @@ fun RoomSettingsEditDialog(
             ) {
                 // Dialog Header
                 Text(
-                    text = "Edit Room Settings",
+                    text = stringResource(R.string.edit_room_settings),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1F2937),
@@ -107,7 +109,7 @@ fun RoomSettingsEditDialog(
                 
                 // Max Players Input Field
                 SettingsInputField(
-                    label = "Max Players",
+                    label = stringResource(R.string.max_players),
                     value = editableSettings.maxPlayers,
                     onValueChange = { newValue ->
                         editableSettings = editableSettings.copy(maxPlayers = newValue)
@@ -119,7 +121,7 @@ fun RoomSettingsEditDialog(
                 
                 // Max Rounds Input Field
                 SettingsInputField(
-                    label = "Max Rounds",
+                    label = stringResource(R.string.max_rounds),
                     value = editableSettings.maxRounds,
                     onValueChange = { newValue ->
                         editableSettings = editableSettings.copy(maxRounds = newValue)
@@ -131,7 +133,7 @@ fun RoomSettingsEditDialog(
                 
                 // Round Duration Input Field
                 SettingsInputField(
-                    label = "Round Duration (seconds)",
+                    label = stringResource(R.string.round_duration),
                     value = editableSettings.roundDurationSeconds,
                     onValueChange = { newValue ->
                         editableSettings = editableSettings.copy(roundDurationSeconds = newValue)
@@ -144,7 +146,7 @@ fun RoomSettingsEditDialog(
                 
                 // Voting Duration Input Field
                 SettingsInputField(
-                    label = "Voting Duration (seconds)",
+                    label = stringResource(R.string.voting_duration),
                     value = editableSettings.votingDurationSeconds,
                     onValueChange = { newValue ->
                         editableSettings = editableSettings.copy(votingDurationSeconds = newValue)
@@ -168,7 +170,7 @@ fun RoomSettingsEditDialog(
                         }
                     },
                     onAddTopic = {
-                        val validationError = RoomSettingsValidator.validateTopicName(topicInputText, editableSettings.topics)
+                        val validationError = RoomSettingsValidator.validateTopicName(topicInputText, editableSettings.topics, context)
                         if (validationError != null) {
                             topicInputError = validationError
                         } else {
@@ -190,7 +192,8 @@ fun RoomSettingsEditDialog(
                     onRemoveTopic = { topic ->
                         val validationError = RoomSettingsValidator.validateTopicRemoval(
                             editableSettings.topics,
-                            topic
+                            topic,
+                            context
                         )
 
                         if (validationError == null) {
@@ -232,7 +235,7 @@ fun RoomSettingsEditDialog(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Text(
-                            "Cancel",
+                            stringResource(R.string.cancel),
                             fontWeight = FontWeight.Medium,
                             modifier = Modifier.padding(vertical = 4.dp)
                         )
@@ -250,13 +253,13 @@ fun RoomSettingsEditDialog(
                     ) {
                         if (isLoading) {
                             Text(
-                                "Saving...",
+                                stringResource(R.string.saving),
                                 fontWeight = FontWeight.Medium,
                                 modifier = Modifier.padding(vertical = 4.dp)
                             )
                         } else {
                             Text(
-                                "Save",
+                                stringResource(R.string.save),
                                 fontWeight = FontWeight.Medium,
                                 modifier = Modifier.padding(vertical = 4.dp)
                             )
@@ -271,14 +274,15 @@ fun RoomSettingsEditDialog(
     showRemoveConfirmation?.let { topicToRemove ->
         AlertDialog(
             onDismissRequest = { showRemoveConfirmation = null },
-            title = { Text("Remove Topic") },
-            text = { Text("Are you sure you want to remove \"${topicToRemove.name}\"?") },
+            title = { Text(stringResource(R.string.remove_topic_title)) },
+            text = { Text(stringResource(R.string.remove_topic_message, topicToRemove.name)) },
             confirmButton = {
                 TextButton(
                     onClick = {
                         val validationError = RoomSettingsValidator.validateTopicRemoval(
                             editableSettings.topics, 
-                            topicToRemove
+                            topicToRemove,
+                            context
                         )
                         if (validationError == null) {
                             editableSettings = editableSettings.copy(
@@ -288,12 +292,12 @@ fun RoomSettingsEditDialog(
                         showRemoveConfirmation = null
                     }
                 ) {
-                    Text("Remove")
+                    Text(stringResource(R.string.remove))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showRemoveConfirmation = null }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -374,7 +378,7 @@ private fun SettingsInputField(
             ) {
                 Icon(
                     Icons.Default.Add,
-                    contentDescription = "Increase $label",
+                    contentDescription = stringResource(R.string.increase_label, label),
                     tint = if (value < maxValue) Color(0xFF6B7280) else Color(0xFFD1D5DB)
                 )
             }
@@ -395,7 +399,7 @@ private fun SettingsInputField(
         if (errorMessage == null) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Range: $minValue - $maxValue",
+                text = stringResource(R.string.range_label, minValue, maxValue),
                 fontSize = 12.sp,
                 color = Color(0xFF9CA3AF),
                 modifier = Modifier.fillMaxWidth()
@@ -420,7 +424,7 @@ private fun TopicsManagementSection(
 ) {
     Column {
         Text(
-            text = "Topics",
+            text = stringResource(R.string.topics),
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             color = Color(0xFF374151)
@@ -438,7 +442,7 @@ private fun TopicsManagementSection(
                 value = topicInputText,
                 onValueChange = onTopicInputChange,
                 modifier = Modifier.fillMaxWidth().weight(1f),
-                placeholder = { Text("Enter topic name") },
+                placeholder = { Text(stringResource(R.string.enter_topic_name)) },
                 isError = topicInputError != null,
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
@@ -451,7 +455,7 @@ private fun TopicsManagementSection(
             ) {
                 Icon(
                     Icons.Default.Add,
-                    contentDescription = "Add topic",
+                    contentDescription = stringResource(R.string.add_topic),
                     tint = if (topicInputText.trim().isNotEmpty()) Color(0xFF10B981) else Color(0xFFD1D5DB)
                 )
             }
@@ -472,7 +476,7 @@ private fun TopicsManagementSection(
         if (topicInputError == null) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Max 40 characters",
+                text = stringResource(R.string.max_characters),
                 fontSize = 12.sp,
                 color = Color(0xFF9CA3AF),
                 modifier = Modifier.fillMaxWidth()
@@ -490,7 +494,7 @@ private fun TopicsManagementSection(
             )
         } else {
             Text(
-                text = "No topics added yet",
+                text = stringResource(R.string.no_topics_added),
                 fontSize = 12.sp,
                 color = Color(0xFF9CA3AF),
                 modifier = Modifier.fillMaxWidth()

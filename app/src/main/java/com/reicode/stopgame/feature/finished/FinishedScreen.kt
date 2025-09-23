@@ -14,10 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.reicode.stopgame.R
 import com.reicode.stopgame.realtime.dto.PlayerDto
 import com.reicode.stopgame.realtime.dto.RoomDto
 import com.reicode.stopgame.shared.GameScreenLayout
@@ -36,7 +38,7 @@ fun FinishedScreen(
         room = room,
         currentPlayer = currentPlayer,
         onLeaveRoom = onLeaveRoom,
-        statusText = "Game completed - $totalRounds rounds played"
+        statusText = stringResource(R.string.game_completed_status, totalRounds)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             // Winner Celebration Card
@@ -119,7 +121,7 @@ private fun WinnerCelebrationCard(
                 }
                 
                 Text(
-                    text = "🎉 WINNER! 🎉",
+                    text = stringResource(R.string.winner_announcement),
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
                     color = Color(0xFFD97706)
@@ -134,7 +136,7 @@ private fun WinnerCelebrationCard(
                 
                 if (isCurrentPlayer) {
                     Text(
-                        text = "Congratulations! You won! 🏆",
+                        text = stringResource(R.string.congratulations_winner),
                         fontSize = 16.sp,
                         color = Color(0xFF059669),
                         fontWeight = FontWeight.Medium,
@@ -142,7 +144,7 @@ private fun WinnerCelebrationCard(
                     )
                 } else {
                     Text(
-                        text = "Congratulations to the winner! 👏",
+                        text = stringResource(R.string.congratulations_other),
                         fontSize = 16.sp,
                         color = Color(0xFF6B7280),
                         textAlign = TextAlign.Center
@@ -157,7 +159,7 @@ private fun WinnerCelebrationCard(
                     )
                 ) {
                     Text(
-                        text = "${winner.score} POINTS",
+                        text = stringResource(R.string.points_caps, winner.score),
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp,
                         color = Color.White,
@@ -183,7 +185,7 @@ private fun FinalLeaderboardCard(
             modifier = Modifier.padding(20.dp)
         ) {
             Text(
-                text = "Final Standings",
+                text = stringResource(R.string.final_standings),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 color = Color(0xFF1F2937),
@@ -297,7 +299,7 @@ private fun FinalPlayerRankItem(
                         )
                         if (isCurrentPlayer) {
                             Text(
-                                text = "(You)",
+                                text = stringResource(R.string.you_parentheses),
                                 fontSize = 12.sp,
                                 color = Color(0xFF3B82F6),
                                 fontWeight = FontWeight.Medium
@@ -305,7 +307,7 @@ private fun FinalPlayerRankItem(
                         }
                         if (player.isHost) {
                             Text(
-                                text = "HOST",
+                                text = stringResource(R.string.host_label),
                                 fontSize = 10.sp,
                                 color = Color(0xFF059669),
                                 fontWeight = FontWeight.Bold,
@@ -321,10 +323,10 @@ private fun FinalPlayerRankItem(
                     
                     Text(
                         text = when (rank) {
-                            1 -> "🏆 Champion!"
-                            2 -> "🥈 Runner-up"
-                            3 -> "🥉 Third place"
-                            else -> "Great game!"
+                            1 -> stringResource(R.string.champion)
+                            2 -> stringResource(R.string.runner_up)
+                            3 -> stringResource(R.string.third_place_final)
+                            else -> stringResource(R.string.great_game)
                         },
                         fontSize = 12.sp,
                         color = rankColor,
@@ -335,7 +337,7 @@ private fun FinalPlayerRankItem(
             
             // Score with winner emphasis
             Text(
-                text = "${player.score} pts",
+                text = stringResource(R.string.points_short, player.score),
                 fontWeight = if (isWinner) FontWeight.ExtraBold else FontWeight.Bold,
                 fontSize = if (isWinner) 20.sp else 18.sp,
                 color = if (isWinner) Color(0xFFD97706) else Color(0xFF1F2937)
@@ -359,7 +361,7 @@ private fun GameSummaryCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Game Summary",
+                text = stringResource(R.string.game_summary),
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 color = Color(0xFF1F2937),
@@ -381,7 +383,7 @@ private fun GameSummaryCard(
                         color = Color(0xFF3B82F6)
                     )
                     Text(
-                        text = "Rounds",
+                        text = stringResource(R.string.rounds_label),
                         fontSize = 12.sp,
                         color = Color(0xFF6B7280)
                     )
@@ -395,7 +397,7 @@ private fun GameSummaryCard(
                         color = Color(0xFF10B981)
                     )
                     Text(
-                        text = "Players",
+                        text = stringResource(R.string.players_label),
                         fontSize = 12.sp,
                         color = Color(0xFF6B7280)
                     )
@@ -405,7 +407,7 @@ private fun GameSummaryCard(
             Spacer(Modifier.height(12.dp))
             
             Text(
-                text = "Thanks for playing! 🎮",
+                text = stringResource(R.string.thanks_for_playing),
                 fontSize = 14.sp,
                 color = Color(0xFF6B7280),
                 textAlign = TextAlign.Center

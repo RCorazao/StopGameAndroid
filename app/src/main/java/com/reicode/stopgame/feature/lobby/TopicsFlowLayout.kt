@@ -12,11 +12,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.reicode.stopgame.R
 import com.reicode.stopgame.realtime.dto.TopicDto
 import kotlin.math.max
 
@@ -56,7 +58,7 @@ fun TopicsFlowLayout(
                                     if (isEditMode) {
                                         Icon(
                                             Icons.Default.Close,
-                                            contentDescription = "Remove ${topic.name}",
+                                            contentDescription = stringResource(R.string.remove_topic_description, topic.name),
                                             modifier = Modifier.size(14.dp)
                                         )
                                     }

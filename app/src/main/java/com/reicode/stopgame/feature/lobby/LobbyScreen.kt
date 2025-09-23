@@ -9,11 +9,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.reicode.stopgame.R
 import com.reicode.stopgame.feature.lobby.data.RoomSettings
 import com.reicode.stopgame.realtime.dto.PlayerDto
 import com.reicode.stopgame.realtime.dto.RoomDto
@@ -44,7 +46,7 @@ fun LobbyScreen(
             room = room,
             currentPlayer = currentPlayer,
             onLeaveRoom = onLeaveRoom,
-            statusText = "Waiting for players"
+            statusText = stringResource(R.string.status_waiting_players)
     ) {
         // --- Players ---
         Card(
@@ -54,7 +56,7 @@ fun LobbyScreen(
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
                 Text(
-                        "Players",
+                        stringResource(R.string.players),
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         color = Color(0xFF1F2937)
@@ -74,7 +76,7 @@ fun LobbyScreen(
                         )
                         if (player.id == currentPlayer?.id) {
                             Spacer(Modifier.width(8.dp))
-                            Text(text = "You", fontSize = 14.sp, color = Color(0xFF6B7280))
+                            Text(text = stringResource(R.string.you), fontSize = 14.sp, color = Color(0xFF6B7280))
                         }
                         Spacer(Modifier.weight(1f))
                         if (player.isHost) {
@@ -82,7 +84,7 @@ fun LobbyScreen(
                                     onClick = {},
                                     label = {
                                         Text(
-                                                "Host",
+                                                stringResource(R.string.host),
                                                 fontSize = 12.sp,
                                                 fontWeight = FontWeight.Medium
                                         )
@@ -120,7 +122,7 @@ fun LobbyScreen(
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
-                                "Room Settings",
+                                stringResource(R.string.room_settings),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 color = Color(0xFF1F2937)
@@ -129,7 +131,7 @@ fun LobbyScreen(
                     // Only show edit button for host
                     if (currentPlayer?.isHost == true) {
                         TextButton(onClick = { showEditDialog = true }) {
-                            Text("Edit", color = Color(0xFF3B82F6), fontWeight = FontWeight.Medium)
+                            Text(stringResource(R.string.edit_settings), color = Color(0xFF3B82F6), fontWeight = FontWeight.Medium)
                         }
                     }
                 }
@@ -142,7 +144,7 @@ fun LobbyScreen(
                 ) {
                     Column {
                         Text(
-                                "Max Players",
+                                stringResource(R.string.max_players_label),
                                 fontSize = 12.sp,
                                 color = Color(0xFF6B7280),
                                 fontWeight = FontWeight.Medium
@@ -155,7 +157,7 @@ fun LobbyScreen(
                         )
                         Spacer(Modifier.height(12.dp))
                         Text(
-                                "Round Duration",
+                                stringResource(R.string.round_duration_label),
                                 fontSize = 12.sp,
                                 color = Color(0xFF6B7280),
                                 fontWeight = FontWeight.Medium
@@ -169,7 +171,7 @@ fun LobbyScreen(
                     }
                     Column {
                         Text(
-                                "Max Rounds",
+                                stringResource(R.string.max_rounds_label),
                                 fontSize = 12.sp,
                                 color = Color(0xFF6B7280),
                                 fontWeight = FontWeight.Medium
@@ -182,7 +184,7 @@ fun LobbyScreen(
                         )
                         Spacer(Modifier.height(12.dp))
                         Text(
-                                "Voting Duration",
+                                stringResource(R.string.voting_duration_label),
                                 fontSize = 12.sp,
                                 color = Color(0xFF6B7280),
                                 fontWeight = FontWeight.Medium
@@ -198,7 +200,7 @@ fun LobbyScreen(
 
                 Spacer(Modifier.height(20.dp))
                 Text(
-                        "Topics",
+                        stringResource(R.string.topics_label),
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
                         color = Color(0xFF1F2937)
@@ -224,7 +226,7 @@ fun LobbyScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                            "You are the host. Start the first round when ready!",
+                            stringResource(R.string.host_ready_message),
                             textAlign = TextAlign.Center,
                             color = Color(0xFF6B7280),
                             fontSize = 14.sp,
@@ -242,7 +244,7 @@ fun LobbyScreen(
                             shape = RoundedCornerShape(16.dp)
                     ) {
                         Text(
-                                "Start Round 1",
+                                stringResource(R.string.start_game),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 modifier = Modifier.padding(vertical = 4.dp)
@@ -252,7 +254,7 @@ fun LobbyScreen(
                     if ((room?.players?.size ?: 0) < 2) {
                         Spacer(Modifier.height(8.dp))
                         Text(
-                                "Need at least 2 players to start",
+                                stringResource(R.string.need_players),
                                 fontSize = 12.sp,
                                 color = Color(0xFF6B7280),
                                 textAlign = TextAlign.Center
