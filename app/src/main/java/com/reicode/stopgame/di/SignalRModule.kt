@@ -1,5 +1,6 @@
 package com.reicode.stopgame.di
 
+import com.reicode.stopgame.BuildConfig
 import com.reicode.stopgame.realtime.SignalRService
 import dagger.Module
 import dagger.Provides
@@ -14,6 +15,6 @@ object SignalRModule {
     @Provides
     @Singleton
     fun provideSignalRService(): SignalRService {
-        return SignalRService("http://10.0.2.2:5077/gameHub")
+        return SignalRService(BuildConfig.SIGNALR_HUB_URL)
     }
 }
