@@ -75,15 +75,3 @@ dependencies {
     kapt(libs.hilt.compiler)
     implementation("androidx.core:core-splashscreen:1.0.0")
 }
-   debugImplementation(libs.androidx.ui.test.manifest)
-
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.signalr)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.gson)
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
-    implementation("androidx.core:core-splashscreen:1.0.0")
-}
