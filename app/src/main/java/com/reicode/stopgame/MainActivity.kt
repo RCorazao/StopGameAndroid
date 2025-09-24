@@ -1,8 +1,11 @@
 package com.reicode.stopgame
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,12 +29,18 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
 
     @Inject lateinit var signalRService: SignalRService
+    
+    private var backPressedTime: Long = 0
+    private val backPressInterval: Long = 2000 // 2 seconds
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         Thread.sleep(2000)
         installSplashScreen()
+        
+        // Setup double back press to minimize
+        setupDoubleBackPressToMinimize()
 
         lifecycleScope.launch {
             try {
@@ -84,5 +93,28 @@ class MainActivity : ComponentActivity() {
         super.onConfigurationChanged(newConfig)
         // Handle configuration changes (like screen rotation) without disconnecting
         println("🔄 Configuration changed - SignalR connection maintained")
+    }
+    
+    private fun setupDoubleBackPressToMinimize() {
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val currentTime = System.currentTimeMillis()
+                
+                if (currentTime - backPressedTime < backPressInterval) {
+                    // Second press within interval - minimize the app
+                    moveTaskToBack(true)
+                } else {
+                    // First press - show toast and record time
+                    backPressedTime = currentTime
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Press back again to minimize",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+        
+        onBackPressedDispatcher.addCallback(this, callback)
     }
 }
