@@ -175,4 +175,12 @@
     <string name="rounds_label">Rounds</string>
     <string name="players_label">Players</string>
     <string name="thanks_for_playing">Thanks for playing! 🎮</string>
+    
+    <!-- MainActivity -->
+    <string name="press_back_again_to_minimize">Press back again to minimize</string>
+    <string name="no_internet_connection">No Internet Connection</string>
+    <string name="internet_required_message">This app requires an internet connection to work properly.</string>
+    <string name="check_connection_message">Please check your connection and try again.</string>
+    <string name="exit">Exit</string>
+    <string name="retry">Retry</string>
 </resources>
